@@ -20,31 +20,31 @@ namespace Requester
         public static List<Day> Days = new List<Day>{
             new Day(){
                 Date = new DateTime(2021, 11, 15),
-                HoursWashesTable = new int[,]{ {1, 1, 1, 0}, {1, 2, 3, 2}, {1, 2, 2, 2} }
+                HoursWashesTable = new int[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             },
             new Day(){
                 Date = new DateTime(2021, 11, 16),
-                HoursWashesTable = new int[WashesAmount, WashesHours.Count]
+                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 17),
-                HoursWashesTable = new int[WashesAmount, WashesHours.Count]
+                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 18),
-                HoursWashesTable = new int[WashesAmount, WashesHours.Count]
+                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 19),
-                HoursWashesTable = new int[WashesAmount, WashesHours.Count]
+                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 20),
-                HoursWashesTable = new int[WashesAmount, WashesHours.Count]
+                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 21),
-                HoursWashesTable = new int[WashesAmount, WashesHours.Count]
+                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
             }
         };
 
@@ -70,6 +70,8 @@ namespace Requester
                 Bot.BotRun(user, session);
             }
         }
+
+
 
         static void Main()
         {

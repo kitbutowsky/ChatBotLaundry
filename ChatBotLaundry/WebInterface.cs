@@ -6,24 +6,31 @@ namespace Requester
 {
     class WebInterface : IWebInterface
     {
-        public int GetButton()
+        public string GetButton()
         {
-            return int.Parse(Console.ReadLine());
+            return Console.ReadLine();
+        }
+
+        public string GetMessage()
+        {
+            return Console.ReadLine();
         }
 
         public long GetUserId()
         {
             return long.Parse(Console.ReadLine());
         }
-
-        public void SendButtons(List<string> buttons)
+        /// <summary>
+        /// отправляет кнопки и их значения
+        /// принимает список массивов строк где первое значение - текст кнопки, второе значение - то что кнопка возрващает при нажатии
+        /// </summary>
+        /// <param name="buttons"></param>
+        public void SendButtons(List<string[]> buttons)
         {
             var buttns = new List<string>();
-            var num = 1;
             foreach (var button in buttons)
             {
-                buttns.Add(num.ToString() + ". " + button);
-                num++;
+                buttns.Add(button[1] + ". " + button[0]);
             }
             Console.WriteLine(string.Join(" ", buttns));
         }

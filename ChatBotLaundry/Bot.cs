@@ -9,84 +9,117 @@ namespace Requester
     {
         public class Note
         {
+            public int Day;
             public int Time;
-            public int Count;
+            public int Amount;
         }
 
-        public static void BotRun(User user, WebInterface session)
+        public static Note BotRun(User user, WebInterface session)
         {
             if (user.Status != 2)
             {
-                var newNote = new Note();
                 if (user.Status == 1)
                     session.SendMessage("ССК");
                 else
                     session.SendMessage("Клиент");
-                BotClient(user, session);
+                return BotClient(user, session);
             }
             else
             {
-                var newNote = new Note();
                 Console.WriteLine("Администратор");
+                return new Note();
             }
         }
 
-        public static void BotClient(User user, WebInterface session)
+        public static Note BotClient(User user, WebInterface session)
         {
-
-            List<string> GetDayButtons(int status)
+            List<string[]> GetAmountButtons(string d, string t)
             {
-                var buttons = new List<string>();
-                foreach (var d in Days)
-                    if (d.IsFree && ((d.AvailableForSSK && status != 0) || (!d.AvailableForSSK && status == 0)))
+                var time = int.Parse(t);
+                var day = int.Parse(d);
+                var buttons = new List<string[]>();
+                for (var i = 1; i < Days[day].EmptyTimes[time]+1; i++)
+                {
+                    var button = new string[] { i.ToString() + ". ", i.ToString() };
+                    buttons.Add(button);
+                }
+                return buttons;
+            }
+
+            List<string[]> GetTimeButtons(string d)
+            {
+                var day = int.Parse(d);
+                var buttons = new List<string[]>();
+                for (var i = 0; i < Days[day].HoursWashesTable.GetLength(0); i++)
+                {
+                    if(Days[day].EmptyTimes[i] != 0)
                     {
-                        buttons.Add(d.DayOfWeekR + " " + d.EmptySpaces.ToString());
+                        var button = new string[] { WashesHours[i].ToString() + ":00 кол-во свободных машинок:" + Days[day].EmptyTimes[i].ToString(), i.ToString() };
+                        buttons.Add(button);
+                    } 
+                }
+                return buttons;
+            }
+            
+            List<string[]> GetDayButtons(int status)
+            {
+                var buttons = new List<string[]>();
+                for (var d = 0; d < Days.Count; d++)
+                    if (Days[d].IsFree && ((Days[d].AvailableForSSK && status != 0) || (!Days[d].AvailableForSSK && status == 0)))
+                    {
+                        var button = new string[] { Days[d].DayOfWeekR + " " + Days[d].EmptySpaces.ToString(), d.ToString() };
+                        buttons.Add(button);
                     }
                 return buttons;
             }
-            var clientMenuButtons = new List<string> { "Записаться в прачечную", "Отменить запись", "Выкл уведомления", "FAQ" };
+
+            var clientMenuButtons = new List<string[]> { new []{"Записаться в прачечную", "1" }, new []{ "Отменить запись", "2" } , new []{ "Выкл уведомления", "3"}, new []{"FAQ", "4" }};
             session.SendMessage("Выберите действие:");
             while (true)
             {
                 session.SendButtons(clientMenuButtons);
-                int buttonClicked = session.GetButton();
-                if (buttonClicked == 1)
+                var buttonClicked = session.GetButton();
+                if (buttonClicked == "1")
                 {
                     session.SendMessage("Запись");
                     session.SendButtons(GetDayButtons(user.Status));
-                    break;
+                    var selectedDay = session.GetButton();
+                    session.SendButtons(GetTimeButtons(selectedDay));
+                    var selectedTime = session.GetButton();
+                    session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
+                    var selectedAmount = session.GetButton();
+                    return new Note { Day = int.Parse(selectedDay), Time = int.Parse(selectedTime), Amount = int.Parse(selectedAmount) };
                 }
-                else if (buttonClicked == 2)
+                else if (buttonClicked == "2")
                 {
                     session.SendMessage("Отмена");
-                    break;
+                    return new Note();
                 }
-                else if (buttonClicked == 3)
+                else if (buttonClicked == "3")
                 {
                     user.NotificationStatus = !user.NotificationStatus;
                     if (!user.NotificationStatus)
                     {
                         session.SendMessage("Уведомления выключены");
-                        clientMenuButtons[2] = "Вкл уведомления";
+                        clientMenuButtons[2][0] = "Вкл уведомления";
                     }
                     else
                     {
                         session.SendMessage("Уведомления включены"); //метод отправки сообщения
-                        clientMenuButtons[2] = "Выкл уведомления";
+                        clientMenuButtons[2][0] = "Выкл уведомления";
                     }
                 }
-                else if (buttonClicked == 4)
+                else if (buttonClicked == "4")
                     session.SendMessage("Какая-то важная инфа по стирке...");
-                //else if (buttonClicked == "000")
-                //{
-                //    if (!userStatus.ContainsKey(user.ID))
-                //    {
-                //        userStatus.Add(user.ID, 1);
-                //        session.SendMessage("Уровень повышен до ССК");
-                //    }
-                //}
+                else if (buttonClicked == "000")
+                {
+                    if (!userStatus.ContainsKey(user.ID))
+                    {
+                        userStatus.Add(user.ID, 1);
+                        session.SendMessage("Уровень повышен до ССК");
+                    }
+                }
             }
-
         }
     }
 }

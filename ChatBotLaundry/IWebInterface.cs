@@ -7,8 +7,9 @@ namespace Requester
     interface IWebInterface
     {
         long GetUserId();
-        void SendButtons(List<string> buttons);
+        void SendButtons(List<string[]> buttons);
         void SendMessage(string message);
-        int GetButton();
+        string GetButton();
+        string GetMessage();
     }
 }
