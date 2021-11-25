@@ -7,8 +7,7 @@ namespace Requester
 {
     class Bot
     {
-
-        public static TimeNote BotRun(User user, WebInterface session)
+        public static void BotRun( User user, WebInterface session)
         {
             if (user.Status != 2)
             {
@@ -16,58 +15,21 @@ namespace Requester
                     session.SendMessage("ССК");
                 else
                     session.SendMessage("Клиент");
-                return BotClient(user, session);
+                BotClient(user, session);
             }
             else
             {
                 Console.WriteLine("Администратор");
-                return new TimeNote();
             }
         }
 
-        public static TimeNote BotClient(User user, WebInterface session)
+        public static void BotClient(User user, WebInterface session)
         {
-            List<string[]> GetAmountButtons(string d, string t)
-            {
-                var time = int.Parse(t);
-                var day = int.Parse(d);
-                var buttons = new List<string[]>();
-                for (var i = 1; i < Days[day].EmptyTimes[time]+1; i++)
-                {
-                    var button = new string[] { i.ToString() + ". ", i.ToString() };
-                    buttons.Add(button);
-                }
-                return buttons;
-            }
-
-            List<string[]> GetTimeButtons(string d)
-            {
-                var day = int.Parse(d);
-                var buttons = new List<string[]>();
-                for (var i = 0; i < Days[day].HoursWashesTable.GetLength(0); i++)
-                {
-                    if(Days[day].EmptyTimes[i] != 0)
-                    {
-                        var button = new string[] { WashesHours[i].ToString() + ":00 кол-во свободных машинок:" + Days[day].EmptyTimes[i].ToString(), i.ToString() };
-                        buttons.Add(button);
-                    } 
-                }
-                return buttons;
-            }
-            
-            List<string[]> GetDayButtons(int status)
-            {
-                var buttons = new List<string[]>();
-                for (var d = 0; d < Days.Count; d++)
-                    if (Days[d].IsFree && ((Days[d].AvailableForSSK && status != 0) || (!Days[d].AvailableForSSK && status == 0)))
-                    {
-                        var button = new string[] { Days[d].DayOfWeekR + " " + Days[d].EmptySpaces.ToString(), d.ToString() };
-                        buttons.Add(button);
-                    }
-                return buttons;
-            }
-
-            var clientMenuButtons = new List<string[]> { new []{"Записаться в прачечную", "1" }, new []{ "Отменить запись", "2" } , new []{ "Выкл уведомления", "3"}, new []{"FAQ", "4" }};
+            var clientMenuButtons = new List<string[]> {
+                new []{"Записаться в прачечную", "1" }, 
+                new []{ "Отменить запись", "2" } , 
+                new []{ "Выкл уведомления", "3"}, 
+                new []{"FAQ", "4" }};
             session.SendMessage("Выберите действие:");
             while (true)
             {
@@ -82,12 +44,14 @@ namespace Requester
                     var selectedTime = session.GetButton();
                     session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
                     var selectedAmount = session.GetButton();
-                    return new TimeNote { Day = int.Parse(selectedDay), Time = int.Parse(selectedTime), Amount = int.Parse(selectedAmount) };
+                    var note = new TimeNote { UserID = user.ID, Day = int.Parse(selectedDay), Time = int.Parse(selectedTime), Amount = int.Parse(selectedAmount) };
+                    MakeNote(note);
+                    break;
                 }
                 else if (buttonClicked == "2")
                 {
                     session.SendMessage("Отмена");
-                    return new TimeNote();
+                    break;
                 }
                 else if (buttonClicked == "3")
                 {
@@ -114,6 +78,58 @@ namespace Requester
                     }
                 }
             }
+        }
+
+        private static List<string[]> GetAmountButtons(string d, string t)
+        {
+            var time = int.Parse(t);
+            var day = int.Parse(d);
+            var buttons = new List<string[]>();
+            for (var i = 1; i < Days[day].EmptyTimes[time] + 1; i++)
+            {
+                var button = new string[] { i.ToString() + ". ", i.ToString() };
+                buttons.Add(button);
+            }
+            return buttons;
+        }
+
+        private static List<string[]> GetDayButtons(int status)
+        {
+            var buttons = new List<string[]>();
+            for (var d = 0; d < Days.Count; d++)
+                if (Days[d].IsFree && ((Days[d].AvailableForSSK && status != 0) || (!Days[d].AvailableForSSK && status == 0)))
+                {
+                    var button = new string[] { Days[d].DayOfWeekR + " " + Days[d].EmptySpaces.ToString(), d.ToString() };
+                    buttons.Add(button);
+                }
+            return buttons;
+        }
+
+        private static List<string[]> GetTimeButtons(string d)
+        {
+            var day = int.Parse(d);
+            var buttons = new List<string[]>();
+            for (var i = 0; i < Days[day].HoursWashesTable.GetLength(0); i++)
+            {
+                if (Days[day].EmptyTimes[i] != 0)
+                {
+                    var button = new string[] { WashesHours[i].ToString() + ":00 кол-во свободных машинок:" + Days[day].EmptyTimes[i].ToString(), i.ToString() };
+                    buttons.Add(button);
+                }
+            }
+            return buttons;
+        }
+
+        private static void MakeNote(TimeNote note)
+        {
+            //добавляет запись в список записей
+            Notes.Add(note);
+            //ищет первую свободную ячейку
+            var i = 0;
+            while (Days[note.Day].HoursWashesTable[note.Time, i] != 0) i++;
+            //записывает ID note.Amount раз
+            for (var j = i; j < note.Amount + i; j++)
+                Days[note.Day].HoursWashesTable[note.Time, j] = note.UserID;
         }
     }
 }

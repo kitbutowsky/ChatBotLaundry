@@ -58,7 +58,7 @@ namespace Requester
         /// <summary>
         /// Принимает значения ID [время, количесво машинок] 
         /// </summary>
-        public int[,] HoursWashesTable;
+        public long[,] HoursWashesTable;
 
         public override string ToString()
         {

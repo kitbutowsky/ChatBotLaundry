@@ -20,41 +20,49 @@ namespace Requester
         public static List<Day> Days = new List<Day>{
             new Day(){
                 Date = new DateTime(2021, 11, 15),
-                HoursWashesTable = new int[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
+                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             },
             new Day(){
                 Date = new DateTime(2021, 11, 16),
-                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 17),
-                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 18),
-                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 19),
-                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 20),
-                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 21),
-                HoursWashesTable = new int[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
             }
         };
+
+        //список записей
+        public static List<TimeNote> Notes = new List<TimeNote>();
 
         //Класс записи в праченую
         public class TimeNote
         {
-            public int UserID { get; set; }
+            public long UserID { get; set; }
             public int Day { get; set; }
             public int Time { get; set; }
             public int Amount { get; set; }
+            public bool Empty {
+                get {
+                    return (UserID == 0);
+                }
+            }
             public override string ToString()
             {
                 return UserID.ToString(UserID.ToString() + ' ' + Day.ToString() + ' ' + Time.ToString() + ' ' + Amount.ToString());
@@ -68,7 +76,7 @@ namespace Requester
                 var user = new User();
                 var session = new WebInterface();
                 user.ID = session.GetUserId();
-                Bot.BotRun(user, session);
+                Bot.BotRun( user, session);  
             }
         }
 
@@ -84,6 +92,7 @@ namespace Requester
                 var newDay = new Day
                 {
                     Date = DateTime.UtcNow,
+                    HoursWashesTable = new long[WashesHours.Count, WashesAmount]
                 };
                 Days.Add(newDay);
             }
