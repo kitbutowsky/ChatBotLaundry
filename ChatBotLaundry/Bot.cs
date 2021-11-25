@@ -7,14 +7,8 @@ namespace Requester
 {
     class Bot
     {
-        public class Note
-        {
-            public int Day;
-            public int Time;
-            public int Amount;
-        }
 
-        public static Note BotRun(User user, WebInterface session)
+        public static TimeNote BotRun(User user, WebInterface session)
         {
             if (user.Status != 2)
             {
@@ -27,11 +21,11 @@ namespace Requester
             else
             {
                 Console.WriteLine("Администратор");
-                return new Note();
+                return new TimeNote();
             }
         }
 
-        public static Note BotClient(User user, WebInterface session)
+        public static TimeNote BotClient(User user, WebInterface session)
         {
             List<string[]> GetAmountButtons(string d, string t)
             {
@@ -88,12 +82,12 @@ namespace Requester
                     var selectedTime = session.GetButton();
                     session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
                     var selectedAmount = session.GetButton();
-                    return new Note { Day = int.Parse(selectedDay), Time = int.Parse(selectedTime), Amount = int.Parse(selectedAmount) };
+                    return new TimeNote { Day = int.Parse(selectedDay), Time = int.Parse(selectedTime), Amount = int.Parse(selectedAmount) };
                 }
                 else if (buttonClicked == "2")
                 {
                     session.SendMessage("Отмена");
-                    return new Note();
+                    return new TimeNote();
                 }
                 else if (buttonClicked == "3")
                 {

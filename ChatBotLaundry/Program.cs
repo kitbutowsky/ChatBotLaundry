@@ -52,11 +52,12 @@ namespace Requester
         public class TimeNote
         {
             public int UserID { get; set; }
+            public int Day { get; set; }
             public int Time { get; set; }
-            public int Count { get; set; }
+            public int Amount { get; set; }
             public override string ToString()
             {
-                return UserID.ToString();
+                return UserID.ToString(UserID.ToString() + ' ' + Day.ToString() + ' ' + Time.ToString() + ' ' + Amount.ToString());
             }
         }
 
@@ -71,11 +72,8 @@ namespace Requester
             }
         }
 
-
-
         static void Main()
         {
-
             var thread = new Thread(() => CheckMessege());
             thread.Start();
             while (true)
@@ -88,7 +86,6 @@ namespace Requester
                     Date = DateTime.UtcNow,
                 };
                 Days.Add(newDay);
-
             }
         }
     }
