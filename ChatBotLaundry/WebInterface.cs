@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Requester
+namespace ChatBotLaundry
 {
     class WebInterface : IWebInterface
     {
@@ -20,11 +20,7 @@ namespace Requester
         {
             return long.Parse(Console.ReadLine());
         }
-        /// <summary>
-        /// отправляет кнопки и их значения
-        /// принимает список массивов строк где первое значение - текст кнопки, второе значение - то что кнопка возрващает при нажатии
-        /// </summary>
-        /// <param name="buttons"></param>
+        
         public void SendButtons(List<string[]> buttons)
         {
             var buttns = new List<string>();
