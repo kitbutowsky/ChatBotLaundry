@@ -22,19 +22,14 @@ namespace ChatBotLaundry
                 Console.WriteLine("Администратор");
             }
         }
-
+        
         public static void BotClient(User user, WebInterface session)
         {
-            var clientMenuButtons = new List<string[]> {
-                new []{"Записаться в прачечную", "1" }, 
-                new []{ "Отменить запись", "2" } , 
-                new []{ "Выкл уведомления", "3"}, 
-                new []{"FAQ", "4" }};
-
+            
             session.SendMessage("Выберите действие:");
             while (true)
             {
-                session.SendButtons(clientMenuButtons);
+                session.SendButtons(GetClientMenuButtons(user));
                 var buttonClicked = session.GetButton();
                 if (buttonClicked == "1")
                 {
@@ -63,15 +58,13 @@ namespace ChatBotLaundry
                 else if (buttonClicked == "3")
                 {
                     user.NotificationStatus = !user.NotificationStatus;
-                    if (!user.NotificationStatus)
+                    if (user.NotificationStatus)
                     {
                         session.SendMessage("Уведомления выключены");
-                        clientMenuButtons[2][0] = "Вкл уведомления";
                     }
                     else
                     {
-                        session.SendMessage("Уведомления включены"); //метод отправки сообщения
-                        clientMenuButtons[2][0] = "Выкл уведомления";
+                        session.SendMessage("Уведомления включены");
                     }
                 }
                 else if (buttonClicked == "4")
@@ -153,6 +146,31 @@ namespace ChatBotLaundry
             //записывает ID note.Amount раз
             for (var j = i; j < note.Amount + i; j++)
                 Data.Days[note.DayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
+        }
+
+        private static List<string[]> GetClientMenuButtons(User user)
+        {
+            var clientMenuButtons = new List<string[]> {
+                new []{"Записаться в прачечную", "1" },
+                new []{ "Выкл уведомления", "3"},
+                new []{ "FAQ", "4" }};
+
+            if (Data.Notes.FindIndex(delegate (TimeNote note)
+            {
+                return note.UserID == user.ID;
+            }
+            ) != -1)
+                clientMenuButtons.Insert(1, new[] { "Отмена", "2" });
+
+            if (!user.NotificationStatus)
+            {
+                clientMenuButtons[^2][0] = "Вкл уведомления";
+            }
+            else
+            {
+                clientMenuButtons[^2][0] = "Выкл уведомления";
+            }
+            return clientMenuButtons;
         }
     }
 }
