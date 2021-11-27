@@ -40,32 +40,23 @@ namespace ChatBotLaundry
                     var selectedTime = session.GetButton();
                     session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
                     var selectedAmount = session.GetButton();
-                    var note = new TimeNote(
-                        user.ID, 
-                        int.Parse(selectedDay), 
-                        int.Parse(selectedTime), 
-                        int.Parse(selectedAmount)
-                        );
-                    MakeNote(note);
+                    MakeNote(user, selectedDay, selectedTime, selectedAmount);
                     break;
                 }
                 else if (buttonClicked == "2")
                 {
                     session.SendMessage("Отмена записи");
                     session.SendButtons(GetNotesButtons(user));
-                    var selectedDay = session.GetButton();
+                    var selectedNote = int.Parse(session.GetButton());
+                    RemoveNote(user, selectedNote);
                 }
                 else if (buttonClicked == "3")
                 {
                     user.NotificationStatus = !user.NotificationStatus;
                     if (user.NotificationStatus)
-                    {
                         session.SendMessage("Уведомления выключены");
-                    }
                     else
-                    {
                         session.SendMessage("Уведомления включены");
-                    }
                 }
                 else if (buttonClicked == "4")
                     session.SendMessage("Какая-то важная инфа по стирке...");
@@ -76,6 +67,47 @@ namespace ChatBotLaundry
                         Data.userStatus.Add(user.ID, 1);
                         session.SendMessage("Уровень повышен до ССК");
                     }
+                }
+            }
+        }
+
+        private static void MakeNote(User user, string selectedDay, string selectedTime, string selectedAmount)
+        {
+            var note = new TimeNote(
+                                    user.ID,
+                                    int.Parse(selectedDay),
+                                    int.Parse(selectedTime),
+                                    int.Parse(selectedAmount)
+                                    );
+            //добавляет запись в список записей
+            Data.Notes.Add(note);
+            //ищет первую свободную ячейку
+            var i = 0;
+            while (Data.Days[note.DayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
+            //записывает ID note.Amount раз
+            for (var j = i; j < note.Amount + i; j++)
+                Data.Days[note.DayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
+        }
+
+        private static void RemoveNote(User user, int selectedNote)
+        {
+            var notes = Data.Notes.FindAll(delegate (TimeNote note)
+            {
+                return note.UserID == user.ID;
+            });
+            Data.Notes.Remove(notes[selectedNote]);
+            var amount = notes[selectedNote].Amount;
+            var dayIndex = Data.Days.FindIndex(delegate (Day day)
+            {
+                return day.Date == notes[selectedNote].Day.Date;
+            });
+            for (var i = 0; i < Data.WashesAmount; i++)
+            {
+                if (Data.Days[dayIndex].HoursWashesTable[notes[selectedNote].Time, i] == user.ID
+                    && amount != 0)
+                {
+                    Data.Days[dayIndex].HoursWashesTable[notes[selectedNote].Time, i] = 0;
+                    amount -= 1;
                 }
             }
         }
