@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Requester
+namespace ChatBotLaundry
 {
     /// <summary>
     /// класс дня записи содержит дату, день недели, статус доступности, статус пользователя, таблицу ячеек записи
     /// </summary>
     public class Day
     {
-        string[] dayOfWeekRussian = new[] {  "Воскресенье","Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота" };
+        readonly string[] dayOfWeekRussian = new[] {  "Воскресенье","Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота" };
         public DateTime Date;
         public string DayOfWeekR { get { return dayOfWeekRussian[(int)Date.DayOfWeek]; } }
         public bool AvailableForSSK { get { return Date.DayOfWeek == DayOfWeek.Sunday || Date.DayOfWeek == DayOfWeek.Wednesday; } }
@@ -56,13 +56,9 @@ namespace Requester
             }
         }
         /// <summary>
+        /// Таблица записи одного дня
         /// Принимает значения ID [время, количесво машинок] 
         /// </summary>
         public long[,] HoursWashesTable;
-
-        public override string ToString()
-        {
-            return Date.ToString() + ' ';
-        }
     }
 }
