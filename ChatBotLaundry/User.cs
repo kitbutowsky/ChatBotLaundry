@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Requester
+namespace ChatBotLaundry
 {
     //класс пользователя
     public class User
@@ -12,9 +12,9 @@ namespace Requester
         {
             get
             {
-                if (!Program.userStatus.ContainsKey(ID))
+                if (!Data.userStatus.ContainsKey(ID))
                     return 0;
-                return Program.userStatus[ID];
+                return Data.userStatus[ID];
             }
         }
 

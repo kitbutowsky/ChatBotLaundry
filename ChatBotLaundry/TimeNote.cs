@@ -28,7 +28,7 @@ namespace ChatBotLaundry
             this.dayForNotation = dayForNotation;
             this.time = time;
             this.amount = amount;
-            this.date = Program.Days[dayForNotation];
+            this.date = Data.Days[dayForNotation];
         }
 
         public bool Empty
@@ -43,7 +43,7 @@ namespace ChatBotLaundry
         {
             return "ID: " + userID.ToString() +
                     " День: " + date.DayOfWeekR +
-                    " Время: " + Program.WashesHours[time].ToString() +
+                    " Время: " + Data.WashesHours[time].ToString() +
                     " Количество машинок: " + amount.ToString();
         }
     }

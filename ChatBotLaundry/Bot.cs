@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using static Requester.Program;
+using static ChatBotLaundry.Program;
 
-namespace Requester
+namespace ChatBotLaundry
 {
     class Bot
     {
@@ -30,6 +30,7 @@ namespace Requester
                 new []{ "Отменить запись", "2" } , 
                 new []{ "Выкл уведомления", "3"}, 
                 new []{"FAQ", "4" }};
+
             session.SendMessage("Выберите действие:");
             while (true)
             {
@@ -44,14 +45,20 @@ namespace Requester
                     var selectedTime = session.GetButton();
                     session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
                     var selectedAmount = session.GetButton();
-                    var note = new TimeNote { UserID = user.ID, Day = int.Parse(selectedDay), Time = int.Parse(selectedTime), Amount = int.Parse(selectedAmount) };
+                    var note = new TimeNote(
+                        user.ID, 
+                        int.Parse(selectedDay), 
+                        int.Parse(selectedTime), 
+                        int.Parse(selectedAmount)
+                        );
                     MakeNote(note);
                     break;
                 }
                 else if (buttonClicked == "2")
                 {
-                    session.SendMessage("Отмена");
-                    break;
+                    session.SendMessage("Отмена записи");
+                    session.SendButtons(GetNotesButtons(user));
+                    var selectedDay = session.GetButton();
                 }
                 else if (buttonClicked == "3")
                 {
@@ -71,13 +78,29 @@ namespace Requester
                     session.SendMessage("Какая-то важная инфа по стирке...");
                 else if (buttonClicked == "000")
                 {
-                    if (!userStatus.ContainsKey(user.ID))
+                    if (!Data.userStatus.ContainsKey(user.ID))
                     {
-                        userStatus.Add(user.ID, 1);
+                        Data.userStatus.Add(user.ID, 1);
                         session.SendMessage("Уровень повышен до ССК");
                     }
                 }
             }
+        }
+
+        private static List<string[]> GetNotesButtons(User user)
+        {
+            var notes = Data.Notes.FindAll(delegate (TimeNote note)
+            {
+                return note.UserID == user.ID;
+            }
+            ); 
+            var buttons = new List<string[]>();
+            for (var i = 0; i < notes.Count; i++)
+            {
+                var button = new string[] { notes[i].ToString() + "\n",  i.ToString()};
+                buttons.Add(button);
+            }
+            return buttons;
         }
 
         private static List<string[]> GetAmountButtons(string d, string t)
@@ -85,7 +108,7 @@ namespace Requester
             var time = int.Parse(t);
             var day = int.Parse(d);
             var buttons = new List<string[]>();
-            for (var i = 1; i < Days[day].EmptyTimes[time] + 1; i++)
+            for (var i = 1; i < Data.Days[day].EmptyTimes[time] + 1; i++)
             {
                 var button = new string[] { i.ToString() + ". ", i.ToString() };
                 buttons.Add(button);
@@ -96,10 +119,10 @@ namespace Requester
         private static List<string[]> GetDayButtons(int status)
         {
             var buttons = new List<string[]>();
-            for (var d = 0; d < Days.Count; d++)
-                if (Days[d].IsFree && ((Days[d].AvailableForSSK && status != 0) || (!Days[d].AvailableForSSK && status == 0)))
+            for (var d = 0; d < Data.Days.Count; d++)
+                if (Data.Days[d].IsFree && ((Data.Days[d].AvailableForSSK && status != 0) || (!Data.Days[d].AvailableForSSK && status == 0)))
                 {
-                    var button = new string[] { Days[d].DayOfWeekR + " " + Days[d].EmptySpaces.ToString(), d.ToString() };
+                    var button = new string[] { Data.Days[d].DayOfWeekR + " " + Data.Days[d].EmptySpaces.ToString(), d.ToString() };
                     buttons.Add(button);
                 }
             return buttons;
@@ -109,11 +132,11 @@ namespace Requester
         {
             var day = int.Parse(d);
             var buttons = new List<string[]>();
-            for (var i = 0; i < Days[day].HoursWashesTable.GetLength(0); i++)
+            for (var i = 0; i < Data.Days[day].HoursWashesTable.GetLength(0); i++)
             {
-                if (Days[day].EmptyTimes[i] != 0)
+                if (Data.Days[day].EmptyTimes[i] != 0)
                 {
-                    var button = new string[] { WashesHours[i].ToString() + ":00 кол-во свободных машинок:" + Days[day].EmptyTimes[i].ToString(), i.ToString() };
+                    var button = new string[] { Data.WashesHours[i].ToString() + ":00 кол-во свободных машинок:" + Data.Days[day].EmptyTimes[i].ToString(), i.ToString() };
                     buttons.Add(button);
                 }
             }
@@ -123,13 +146,13 @@ namespace Requester
         private static void MakeNote(TimeNote note)
         {
             //добавляет запись в список записей
-            Notes.Add(note);
+            Data.Notes.Add(note);
             //ищет первую свободную ячейку
             var i = 0;
-            while (Days[note.Day].HoursWashesTable[note.Time, i] != 0) i++;
+            while (Data.Days[note.DayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
             //записывает ID note.Amount раз
             for (var j = i; j < note.Amount + i; j++)
-                Days[note.Day].HoursWashesTable[note.Time, j] = note.UserID;
+                Data.Days[note.DayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
         }
     }
 }
