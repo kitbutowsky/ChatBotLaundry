@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Requester
+namespace ChatBotLaundry
 {
     class Program
     {
@@ -50,24 +50,6 @@ namespace Requester
 
         //список записей
         public static List<TimeNote> Notes = new List<TimeNote>();
-
-        //Класс записи в праченую
-        public class TimeNote
-        {
-            public long UserID { get; set; }
-            public int Day { get; set; }
-            public int Time { get; set; }
-            public int Amount { get; set; }
-            public bool Empty {
-                get {
-                    return (UserID == 0);
-                }
-            }
-            public override string ToString()
-            {
-                return UserID.ToString(UserID.ToString() + ' ' + Day.ToString() + ' ' + Time.ToString() + ' ' + Amount.ToString());
-            }
-        }
 
         static void CheckMessege()
         {
