@@ -20,6 +20,7 @@ namespace ChatBotLaundry
             else
             {
                 Console.WriteLine("Администратор");
+                BotAdmin(user, session);
             }
         }
 
@@ -28,52 +29,27 @@ namespace ChatBotLaundry
             session.SendMessage("Выберите действие:");
             while (true)
             {
-                session.SendButtons(GetClientMenuButtons(user));
+                session.SendButtons(GetAdminMenuButtons(user));
                 var buttonClicked = session.GetButton();
                 if (buttonClicked == "1")
                 {
-                    session.SendMessage("Запись");
-                    session.SendButtons(GetDayButtons(user.Status));
-                    var selectedDay = session.GetButton();
-                    session.SendButtons(GetTimeButtons(selectedDay));
-                    var selectedTime = session.GetButton();
-                    session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
-                    var selectedAmount = session.GetButton();
-                    MakeNote(user, selectedDay, selectedTime, selectedAmount);
-                    break;
+                    BotClient(user, session);
                 }
                 else if (buttonClicked == "2")
                 {
-                    session.SendMessage("Отмена записи");
-                    session.SendButtons(GetNotesButtons(user));
-                    var selectedNote = int.Parse(session.GetButton());
-                    RemoveNote(user, selectedNote);
+
                 }
                 else if (buttonClicked == "3")
                 {
-                    user.NotificationStatus = !user.NotificationStatus;
-                    if (user.NotificationStatus)
-                        session.SendMessage("Уведомления выключены");
-                    else
-                        session.SendMessage("Уведомления включены");
-                }
-                else if (buttonClicked == "4")
-                    session.SendMessage("Какая-то важная инфа по стирке...");
 
-                else if (buttonClicked == "000")
-                {
-                    if (!Data.userStatus.ContainsKey(user.ID))
-                    {
-                        Data.userStatus.Add(user.ID, 1);
-                        session.SendMessage("Уровень повышен до ССК");
-                    }
                 }
+                else if (buttonClicked == "4") ;
+                
             }
         }
 
         public static void BotClient(User user, WebInterface session)
         {
-            
             session.SendMessage("Выберите действие:");
             while (true)
             {
@@ -118,6 +94,7 @@ namespace ChatBotLaundry
                 }
             }
         }
+
 
         private static void MakeNote(User user, string selectedDay, string selectedTime, string selectedAmount)
         {
@@ -158,6 +135,18 @@ namespace ChatBotLaundry
                     amount -= 1;
                 }
             }
+        }
+
+
+        private static List<string[]> GetAdminMenuButtons(User user)
+        {
+            var buttons = new List<string[]> {
+                new[] { "Функции клиента", "1" },
+                new[] { "Администрирование пользователей", "2" },
+                new[] { "Администрирование прачечной", "3" },
+                new[] { "Отчетность", "4" }
+            };
+            return buttons;
         }
 
         private static List<string[]> GetNotesButtons(User user)
