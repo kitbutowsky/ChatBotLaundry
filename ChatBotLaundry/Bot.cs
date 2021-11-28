@@ -22,7 +22,55 @@ namespace ChatBotLaundry
                 Console.WriteLine("Администратор");
             }
         }
-        
+
+        public static void BotAdmin(User user, WebInterface session)
+        {
+            session.SendMessage("Выберите действие:");
+            while (true)
+            {
+                session.SendButtons(GetClientMenuButtons(user));
+                var buttonClicked = session.GetButton();
+                if (buttonClicked == "1")
+                {
+                    session.SendMessage("Запись");
+                    session.SendButtons(GetDayButtons(user.Status));
+                    var selectedDay = session.GetButton();
+                    session.SendButtons(GetTimeButtons(selectedDay));
+                    var selectedTime = session.GetButton();
+                    session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
+                    var selectedAmount = session.GetButton();
+                    MakeNote(user, selectedDay, selectedTime, selectedAmount);
+                    break;
+                }
+                else if (buttonClicked == "2")
+                {
+                    session.SendMessage("Отмена записи");
+                    session.SendButtons(GetNotesButtons(user));
+                    var selectedNote = int.Parse(session.GetButton());
+                    RemoveNote(user, selectedNote);
+                }
+                else if (buttonClicked == "3")
+                {
+                    user.NotificationStatus = !user.NotificationStatus;
+                    if (user.NotificationStatus)
+                        session.SendMessage("Уведомления выключены");
+                    else
+                        session.SendMessage("Уведомления включены");
+                }
+                else if (buttonClicked == "4")
+                    session.SendMessage("Какая-то важная инфа по стирке...");
+
+                else if (buttonClicked == "000")
+                {
+                    if (!Data.userStatus.ContainsKey(user.ID))
+                    {
+                        Data.userStatus.Add(user.ID, 1);
+                        session.SendMessage("Уровень повышен до ССК");
+                    }
+                }
+            }
+        }
+
         public static void BotClient(User user, WebInterface session)
         {
             
@@ -170,18 +218,22 @@ namespace ChatBotLaundry
 
         private static List<string[]> GetClientMenuButtons(User user)
         {
-            var clientMenuButtons = new List<string[]> {
-                new []{"Записаться в прачечную", "1" },
-                new []{ "Выкл уведомления", "3"},
-                new []{ "FAQ", "4" }};
+            var clientMenuButtons = new List<string[]>();
 
+            if (Data.Days.FindIndex(delegate (Day day)
+            {
+                return day.EmptySpaces != 0;
+            }
+            ) != -1)
+                clientMenuButtons.Add(new[] { "Записаться в прачечную", "1" });
             if (Data.Notes.FindIndex(delegate (TimeNote note)
             {
                 return note.UserID == user.ID;
             }
             ) != -1)
-                clientMenuButtons.Insert(1, new[] { "Отмена", "2" });
-
+                clientMenuButtons.Add(new[] { "Отмена", "2" });
+            clientMenuButtons.Add(new[] { "Выкл уведомления", "3" });
+            clientMenuButtons.Add(new[] { "FAQ", "4" });
             if (!user.NotificationStatus)
             {
                 clientMenuButtons[^2][0] = "Вкл уведомления";
