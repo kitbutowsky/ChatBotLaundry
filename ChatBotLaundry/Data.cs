@@ -30,27 +30,27 @@ namespace ChatBotLaundry
             },
             new Day(){
                 Date = new DateTime(2021, 11, 16),
-                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             },
             new Day(){
                 Date = new DateTime(2021, 11, 17),
-                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             },
             new Day(){
                 Date = new DateTime(2021, 11, 18),
-                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             },
             new Day(){
                 Date = new DateTime(2021, 11, 19),
-                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             },
             new Day(){
                 Date = new DateTime(2021, 11, 20),
-                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             },
             new Day(){
                 Date = new DateTime(2021, 11, 21),
-                HoursWashesTable = new long[WashesHours.Count, WashesAmount]
+                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} }
             }
         };
 

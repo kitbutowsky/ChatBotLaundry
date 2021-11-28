@@ -8,6 +8,9 @@ namespace ChatBotLaundry
     public class User
     {
         public long ID;
+        /// <summary>
+        /// 1 - сск, 2 - админ
+        /// </summary>
         public int Status
         {
             get

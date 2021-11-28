@@ -222,7 +222,7 @@ namespace ChatBotLaundry
 
             if (Data.Days.FindIndex(delegate (Day day)
             {
-                return day.EmptySpaces != 0;
+                return (day.EmptySpaces != 0) && (day.AvailableForSSK == (user.Status == 1));
             }
             ) != -1)
                 clientMenuButtons.Add(new[] { "Записаться в прачечную", "1" });
