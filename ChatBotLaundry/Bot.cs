@@ -31,20 +31,18 @@ namespace ChatBotLaundry
             {
                 session.SendButtons(GetAdminMenuButtons(user));
                 var buttonClicked = session.GetButton();
-                if (buttonClicked == "1")
+                switch (buttonClicked)
                 {
-                    BotClient(user, session);
+                    case "1":
+                        BotClient(user, session);
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        break;
+                    case "4":
+                        break;
                 }
-                else if (buttonClicked == "2")
-                {
-
-                }
-                else if (buttonClicked == "3")
-                {
-
-                }
-                else if (buttonClicked == "4") ;
-                
             }
         }
 
@@ -55,42 +53,39 @@ namespace ChatBotLaundry
             {
                 session.SendButtons(GetClientMenuButtons(user));
                 var buttonClicked = session.GetButton();
-                if (buttonClicked == "1")
+                switch (buttonClicked)
                 {
-                    session.SendMessage("Запись");
-                    session.SendButtons(GetDayButtons(user.Status));
-                    var selectedDay = session.GetButton();
-                    session.SendButtons(GetTimeButtons(selectedDay));
-                    var selectedTime = session.GetButton();
-                    session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
-                    var selectedAmount = session.GetButton();
-                    MakeNote(user, selectedDay, selectedTime, selectedAmount);
-                    break;
-                }
-                else if (buttonClicked == "2")
-                {
-                    session.SendMessage("Отмена записи");
-                    session.SendButtons(GetNotesButtons(user));
-                    var selectedNote = int.Parse(session.GetButton());
-                    RemoveNote(user, selectedNote);
-                }
-                else if (buttonClicked == "3")
-                {
-                    user.NotificationStatus = !user.NotificationStatus;
-                    if (user.NotificationStatus)
-                        session.SendMessage("Уведомления выключены");
-                    else
-                        session.SendMessage("Уведомления включены");
-                }
-                else if (buttonClicked == "4")
-                    session.SendMessage("Какая-то важная инфа по стирке...");
-                else if (buttonClicked == "000")
-                {
-                    if (!Data.userStatus.ContainsKey(user.ID))
-                    {
-                        Data.userStatus.Add(user.ID, 1);
-                        session.SendMessage("Уровень повышен до ССК");
-                    }
+                    case "1":
+                        session.SendMessage("Запись");
+                        session.SendButtons(GetDayButtons(user.Status));
+                        var selectedDay = session.GetButton();
+                        if (selectedDay == "b") break;  
+                        session.SendButtons(GetTimeButtons(selectedDay));
+                        var selectedTime = session.GetButton();
+                        if (selectedTime == "b") goto case "1";
+                        session.SendButtons(GetAmountButtons(selectedDay, selectedTime));
+                        var selectedAmount = session.GetButton();
+                        if (selectedAmount == "b") goto case "1";
+                        MakeNote(user, selectedDay, selectedTime, selectedAmount);
+                        break;
+                    case "2":
+                        session.SendMessage("Отмена записи");
+                        session.SendButtons(GetNotesButtons(user));
+                        var selectedNote = int.Parse(session.GetButton());
+                        RemoveNote(user, selectedNote);
+                        break;
+                    case "3":
+                        user.NotificationStatus = !user.NotificationStatus;
+                        if (user.NotificationStatus)
+                            session.SendMessage("Уведомления выключены");
+                        else
+                            session.SendMessage("Уведомления включены");
+                        break;
+                    case "4":
+                        session.SendMessage("Какая-то важная инфа по стирке...");
+                        break;
+                    case "b":
+                        return;
                 }
             }
         }
@@ -144,7 +139,8 @@ namespace ChatBotLaundry
                 new[] { "Функции клиента", "1" },
                 new[] { "Администрирование пользователей", "2" },
                 new[] { "Администрирование прачечной", "3" },
-                new[] { "Отчетность", "4" }
+                new[] { "Отчетность", "4" },
+                new[] { "Выйти", "b" }
             };
             return buttons;
         }
@@ -230,6 +226,10 @@ namespace ChatBotLaundry
             else
             {
                 clientMenuButtons[^2][0] = "Выкл уведомления";
+            }
+            if (user.Status != 2)
+            {
+                clientMenuButtons.Add(new[] { "Выйти", "b" });
             }
             return clientMenuButtons;
         }

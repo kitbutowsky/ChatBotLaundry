@@ -28,6 +28,8 @@ namespace ChatBotLaundry
             {
                 buttns.Add(button[1] + ". " + button[0]);
             }
+            if (!buttns.Contains("b. Выйти"))
+                buttns.Add( "b.  Назад");
             Console.WriteLine(string.Join(" ", buttns));
         }
 
