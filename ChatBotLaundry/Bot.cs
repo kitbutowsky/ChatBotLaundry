@@ -168,18 +168,6 @@ namespace ChatBotLaundry
             return buttons;
         }
 
-        private static void MakeNote(TimeNote note)
-        {
-            //добавляет запись в список записей
-            Data.Notes.Add(note);
-            //ищет первую свободную ячейку
-            var i = 0;
-            while (Data.Days[note.DayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
-            //записывает ID note.Amount раз
-            for (var j = i; j < note.Amount + i; j++)
-                Data.Days[note.DayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
-        }
-
         private static List<string[]> GetClientMenuButtons(User user)
         {
             var clientMenuButtons = new List<string[]> {
