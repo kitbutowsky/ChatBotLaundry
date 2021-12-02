@@ -181,7 +181,7 @@ namespace ChatBotLaundry
             }
         }
 
-        //методы получения кнопок клиента
+        //методы получения кнопок
         private static List<string[]> GetNotesButtons(User user)
         {
             var notes = Data.Notes.FindAll(delegate (TimeNote note)
@@ -272,6 +272,28 @@ namespace ChatBotLaundry
         }
 
         //методы админа
+        private static List<long> GetUsersIdsList(string buttonClicked1)
+        {
+            var listIds = new List<long>();
+            foreach (var userCategory in Data.userStatus)
+                if (userCategory.Value == int.Parse(buttonClicked1))
+                    listIds.Add(userCategory.Key);
+            return listIds;
+        }
+
+        private static string GetStringListIds(List<long> listIds)
+        {
+            string stringListIds = "";
+            var i = 0;
+            foreach (var id in listIds)
+            {
+                stringListIds += i.ToString() + " " + id.ToString() + "\n";
+                i++;
+            }
+            return stringListIds;
+        }
+
+        //методы получения кнопок
         private static List<string[]> GetAdminMenuButtons(User user)
         {
             var buttons = new List<string[]> {
@@ -303,27 +325,6 @@ namespace ChatBotLaundry
             if ((Data.AmountOf(status) != 0 && status != 3) || (Data.AmountOf(status) > 1 && status == 3))
                 buttons.Add(new[] { "Удалить", "2" });
             return buttons;
-        }
-
-        private static List<long> GetUsersIdsList(string buttonClicked1)
-        {
-            var listIds = new List<long>();
-            foreach (var userCategory in Data.userStatus)
-                if (userCategory.Value == int.Parse(buttonClicked1))
-                    listIds.Add(userCategory.Key);
-            return listIds;
-        }
-
-        private static string GetStringListIds(List<long> listIds)
-        {
-            string stringListIds = "";
-            var i = 0;
-            foreach (var id in listIds)
-            {
-                stringListIds += i.ToString() + " " + id.ToString() + "\n";
-                i++;
-            } 
-            return stringListIds;
         }
 
     }
