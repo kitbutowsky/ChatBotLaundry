@@ -9,18 +9,28 @@ namespace ChatBotLaundry
     {
         public static void BotRun( User user, WebInterface session)
         {
-            if (user.Status != 2)
+            switch (user.Status)
             {
-                if (user.Status == 1)
-                    session.SendMessage("ССК");
-                else
+                case 0:
                     session.SendMessage("Клиент");
-                BotClient(user, session);
-            }
-            else
-            {
-                Console.WriteLine("Администратор");
-                BotAdmin(user, session);
+                    BotClient(user, session);
+                    break;
+                case 1:
+                    session.SendMessage("ССК");
+                    BotClient(user, session);
+                    break;
+                case 2:
+                    session.SendMessage("Открывающий");
+                    
+                    break;
+                case 3:
+                    session.SendMessage("Администратор");
+                    BotAdmin(user, session);
+                    break;
+                case 4:
+                    session.SendMessage("Вы временно заблокированны");
+                    session.SendMessage("Время до конца блокировки");
+                    break;
             }
         }
 
@@ -37,11 +47,50 @@ namespace ChatBotLaundry
                         BotClient(user, session);
                         break;
                     case "2":
+                        UserAdministrtion(user, session);
                         break;
                     case "3":
                         break;
                     case "4":
                         break;
+                    case "b":
+                        return;
+                }
+            }
+        }
+
+        //ветки диалога
+        private static void UserAdministrtion(User user, WebInterface session)
+        {
+            while (true)
+            {
+                session.SendButtons(GetAdminUsersButtons(user));
+                var buttonClicked1 = session.GetButton();
+                if (buttonClicked1 == "b") break;
+                while (true)
+                {
+                    session.SendMessage(Data.Statuses[int.Parse(buttonClicked1)]);
+                    var listIds = GetUsersIdsList(buttonClicked1);
+                    string stringListIds = GetStringListIds(listIds);
+                    session.SendMessage(stringListIds);
+                    session.SendButtons(GetAdminStatusButtons(user, int.Parse(buttonClicked1)));
+                    var buttonClicked2 = session.GetButton();
+                    switch (buttonClicked2)
+                    {
+                        case "1":
+                            session.SendMessage("Введите id пользователя");
+                            var id = long.Parse(session.GetMessage());
+                            Data.userStatus.Add(id, int.Parse(buttonClicked1));
+                            break;
+                        case "2":
+                            session.SendMessage("Введите номер пользователя");
+                            var num = int.Parse(session.GetMessage());
+                            Data.userStatus.Remove(listIds[num]);
+                            break;
+                        case "b":
+                            break;
+                    }
+                    if (buttonClicked2 == "b") break;
                 }
             }
         }
@@ -90,7 +139,7 @@ namespace ChatBotLaundry
             }
         }
 
-
+        //методы клиента
         private static void MakeNote(User user, string selectedDay, string selectedTime, string selectedAmount)
         {
             var note = new TimeNote(
@@ -132,19 +181,7 @@ namespace ChatBotLaundry
             }
         }
 
-
-        private static List<string[]> GetAdminMenuButtons(User user)
-        {
-            var buttons = new List<string[]> {
-                new[] { "Функции клиента", "1" },
-                new[] { "Администрирование пользователей", "2" },
-                new[] { "Администрирование прачечной", "3" },
-                new[] { "Отчетность", "4" },
-                new[] { "Выйти", "b" }
-            };
-            return buttons;
-        }
-
+        //методы получения кнопок клиента
         private static List<string[]> GetNotesButtons(User user)
         {
             var notes = Data.Notes.FindAll(delegate (TimeNote note)
@@ -233,6 +270,62 @@ namespace ChatBotLaundry
             }
             return clientMenuButtons;
         }
+
+        //методы админа
+        private static List<string[]> GetAdminMenuButtons(User user)
+        {
+            var buttons = new List<string[]> {
+                new[] { "Функции клиента", "1" },
+                new[] { "Администрирование пользователей", "2" },
+                new[] { "Администрирование прачечной", "3" },
+                new[] { "Отчетность", "4" },
+                new[] { "Выйти", "b" }
+            };
+            return buttons;
+        }
+
+        private static List<string[]> GetAdminUsersButtons(User user)
+        {
+            var buttons = new List<string[]> {
+                new[] { "ССК", "1" },
+                new[] { "Открывающие", "2" },
+                new[] { "Администраторы", "3" },
+                new[] { "Черный список", "4" },
+            };
+            return buttons;
+        }
+
+        private static List<string[]> GetAdminStatusButtons(User user, int status)
+        {
+            var buttons = new List<string[]> {
+                new[] { "Добавить", "1" }
+            };
+            if ((Data.AmountOf(status) != 0 && status != 3) || (Data.AmountOf(status) > 1 && status == 3))
+                buttons.Add(new[] { "Удалить", "2" });
+            return buttons;
+        }
+
+        private static List<long> GetUsersIdsList(string buttonClicked1)
+        {
+            var listIds = new List<long>();
+            foreach (var userCategory in Data.userStatus)
+                if (userCategory.Value == int.Parse(buttonClicked1))
+                    listIds.Add(userCategory.Key);
+            return listIds;
+        }
+
+        private static string GetStringListIds(List<long> listIds)
+        {
+            string stringListIds = "";
+            var i = 0;
+            foreach (var id in listIds)
+            {
+                stringListIds += i.ToString() + " " + id.ToString() + "\n";
+                i++;
+            } 
+            return stringListIds;
+        }
+
     }
 }
 

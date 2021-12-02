@@ -13,7 +13,7 @@ namespace ChatBotLaundry
                 var user = new User();
                 var session = new WebInterface();
                 user.ID = session.GetUserId();
-                Bot.BotRun( user, session);  
+                Bot.BotRun(user, session);  
             }
         }
 

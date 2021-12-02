@@ -9,7 +9,7 @@ namespace ChatBotLaundry
     {
         public long ID;
         /// <summary>
-        /// 1 - сск, 2 - админ
+        /// 1 - сск, 2 - админ, 3 - сск, 4 - заблокированный, по умолчанию 0 - клиент
         /// </summary>
         public int Status
         {

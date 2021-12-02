@@ -6,6 +6,12 @@ namespace ChatBotLaundry
 {
     class Data
     {
+        public static List<string> Statuses = new List<string> {
+            "Клиенты",
+            "ССК",
+            "Открывающие",
+            "Админы",
+            "Черный список" };
         /// <summary>
         /// Количество машинок
         /// </summary>
@@ -15,12 +21,24 @@ namespace ChatBotLaundry
         /// </summary>
         public static List<int> WashesHours = new List<int> { 10, 14, 18, 20 };
 
-        //словарь статусов пользователей (1 - сск, 2 - админ)
+        /// <summary>
+        /// словарь статусов пользователей (1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный)
+        /// </summary>
         public static Dictionary<long, int> userStatus = new Dictionary<long, int>{
             {1, 1},
-            {2, 2},
-            {3, 1}
+            {3, 2},
+            {2, 3}
         };
+        /// <summary>
+        /// возвращает количество людей определенного статуса (1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный)
+        /// </summary>
+        public static int AmountOf(int status)
+        { 
+            var count = 0;
+            foreach (var user in userStatus)
+                if (user.Value == status) count++;
+            return count;
+        }
 
         //список дней записи
         public static List<Day> Days = new List<Day>{
