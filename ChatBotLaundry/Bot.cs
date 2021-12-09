@@ -47,7 +47,7 @@ namespace ChatBotLaundry
                         BotClient(user, session);
                         break;
                     case "2":
-                        UserAdministrtion(user, session);
+                        UserAdministrtion(user, session);   
                         break;
                     case "3":
                         break;
@@ -80,12 +80,15 @@ namespace ChatBotLaundry
                         case "1":
                             session.SendMessage("Введите id пользователя");
                             var id = long.Parse(session.GetMessage());
-                            Data.userStatus.Add(id, int.Parse(buttonClicked1));
+                            Data.Users.Add(new User { ID = id, Status = int.Parse(buttonClicked1) });
                             break;
                         case "2":
                             session.SendMessage("Введите номер пользователя");
                             var num = int.Parse(session.GetMessage());
-                            Data.userStatus.Remove(listIds[num]);
+                            Data.Users.Find(delegate (User user)
+                            {
+                                return user.ID == listIds[num];
+                            }).Status = 0;
                             break;
                         case "b":
                             break;
@@ -275,9 +278,9 @@ namespace ChatBotLaundry
         private static List<long> GetUsersIdsList(string buttonClicked1)
         {
             var listIds = new List<long>();
-            foreach (var userCategory in Data.userStatus)
-                if (userCategory.Value == int.Parse(buttonClicked1))
-                    listIds.Add(userCategory.Key);
+            foreach (var userCategory in Data.Users)
+                if (userCategory.Status == int.Parse(buttonClicked1))
+                    listIds.Add(userCategory.ID);
             return listIds;
         }
 

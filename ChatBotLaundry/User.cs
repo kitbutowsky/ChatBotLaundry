@@ -8,18 +8,14 @@ namespace ChatBotLaundry
     public class User
     {
         public long ID;
+        private int status;
+        private string condition;
         /// <summary>
-        /// 1 - сск, 2 - админ, 3 - сск, 4 - заблокированный, по умолчанию 0 - клиент
+        /// 1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный, по умолчанию 0 - клиент
         /// </summary>
-        public int Status
-        {
-            get
-            {
-                if (!Data.userStatus.ContainsKey(ID))
-                    return 0;
-                return Data.userStatus[ID];
-            }
-        }
+        public int Status{ get { return status; } set { status = value; } }
+
+        public string Condition{ get { return condition; } set { condition = value; } }
 
         public bool NotificationStatus = true;
 
