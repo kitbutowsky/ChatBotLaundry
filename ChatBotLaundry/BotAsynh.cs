@@ -156,9 +156,7 @@ namespace ChatBotLaundry
                             session.SendButtons(GetClientMenuButtons(user));
                             break;
                         case "b":
-                            user.Condition = "cl";
-                            session.SendMessage("Выберите действие:");
-                            session.SendButtons(GetClientMenuButtons(user));
+                            user.Condition = "st";
                             return;
                     };
                     break;
