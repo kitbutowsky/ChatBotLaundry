@@ -138,7 +138,6 @@ namespace ChatBotLaundry
                             session.SendButtons(GetNotesButtons(user));
                             break;
                         case "clnt":
-                            user.Condition = "cl";
                             user.NotificationStatus = !user.NotificationStatus;
                             if (user.NotificationStatus)
                                 session.SendMessage("Уведомления включены");
@@ -149,7 +148,6 @@ namespace ChatBotLaundry
                             session.SendButtons(GetClientMenuButtons(user));
                             break;
                         case "info":
-                            user.Condition = "cl";
                             session.SendMessage("Какая-то важная инфа по стирке..."); 
                             Thread.Sleep(1000);
                             session.SendMessage("Выберите действие:");
@@ -209,20 +207,13 @@ namespace ChatBotLaundry
                 case "cldn":
                     if (button != "b")
                     {
-                        user.Condition = "cl";
                         var selectedNote = int.Parse(button);
                         RemoveNote(user, selectedNote);
-                        session.SendMessage("Выберите действие:");
-                        session.SendButtons(GetClientMenuButtons(user));
-                        break;
-                    }
-                    else
-                    {
-                        user.Condition = "cl";
-                        session.SendMessage("Выберите действие:");
-                        session.SendButtons(GetClientMenuButtons(user));
-                        break;
-                    }
+                    }                    
+                    user.Condition = "cl";
+                    session.SendMessage("Выберите действие:");
+                    session.SendButtons(GetClientMenuButtons(user));
+                    break;
             }
         }
 
