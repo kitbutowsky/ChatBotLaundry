@@ -21,7 +21,7 @@ namespace ChatBotLaundry
                     break;
                 case 2:
                     session.SendMessage("Открывающий");
-                    
+
                     break;
                 case 3:
                     session.SendMessage("Администратор");
@@ -43,15 +43,15 @@ namespace ChatBotLaundry
                 var buttonClicked = session.GetButton();
                 switch (buttonClicked)
                 {
-                    case "1":
+                    case "clf":
                         BotClient(user, session);
                         break;
-                    case "2":
+                    case "adus":
                         UserAdministrtion(user, session);   
                         break;
-                    case "3":
+                    case "adl":
                         break;
-                    case "4":
+                    case "re":
                         break;
                     case "b":
                         return;
@@ -300,10 +300,10 @@ namespace ChatBotLaundry
         private static List<string[]> GetAdminMenuButtons(User user)
         {
             var buttons = new List<string[]> {
-                new[] { "Функции клиента", "1" },
-                new[] { "Администрирование пользователей", "2" },
-                new[] { "Администрирование прачечной", "3" },
-                new[] { "Отчетность", "4" },
+                new[] { "Функции клиента", "cl" },
+                new[] { "Администрирование пользователей", "adus" },
+                new[] { "Администрирование прачечной", "adl" },
+                new[] { "Отчетность", "re" },
                 new[] { "Выйти", "b" }
             };
             return buttons;
