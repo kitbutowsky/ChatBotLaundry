@@ -6,7 +6,6 @@ namespace ChatBotLaundry
 {
     interface IWebInterface
     {
-        long GetUserId();
         /// <summary>
         /// отправляет кнопки и их значения
         /// принимает список массивов строк где первое значение - текст кнопки, второе значение - то что кнопка возрващает при нажатии
@@ -14,7 +13,7 @@ namespace ChatBotLaundry
         /// <param name="buttons"></param>
         void SendButtons(List<string[]> buttons);
         void SendMessage(string message);
-        string GetButton();
+        (long, string) GetButton();
         string GetMessage();
     }
 }

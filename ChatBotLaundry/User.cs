@@ -9,7 +9,8 @@ namespace ChatBotLaundry
     {
         public long ID;
         private int status;
-        private string condition;
+        private string condition = "st";
+        public int[] note = new [] {0, 0, 0};
         /// <summary>
         /// 1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный, по умолчанию 0 - клиент
         /// </summary>

@@ -6,9 +6,12 @@ namespace ChatBotLaundry
 {
     class WebInterface : IWebInterface
     {
-        public string GetButton()
+        public (long, string) GetButton()
         {
-            return Console.ReadLine();
+            var strs = Console.ReadLine().Split();
+            var id = long.Parse(strs[0]);
+            var button = strs[1];
+            return (id, button);
         }
 
         public string GetMessage()
