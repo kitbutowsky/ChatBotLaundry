@@ -14,9 +14,12 @@ namespace ChatBotLaundry
             return (id, button);
         }
 
-        public string GetMessage()
+        public (long, string) GetMessage()
         {
-            return Console.ReadLine();
+            var strs = Console.ReadLine().Split();
+            var id = long.Parse(strs[0]);
+            var message = strs[1];
+            return (id, message);
         }
 
         public long GetUserId()

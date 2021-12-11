@@ -14,6 +14,6 @@ namespace ChatBotLaundry
         void SendButtons(List<string[]> buttons);
         void SendMessage(string message);
         (long, string) GetButton();
-        string GetMessage();
+        (long, string) GetMessage();
     }
 }
