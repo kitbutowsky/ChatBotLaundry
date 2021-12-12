@@ -37,109 +37,28 @@ namespace ChatBotLaundry
                     user.Condition = "adm";
                     session.SendMessage("Выберите действие:");
                     session.SendButtons(GetAdminMenuButtons());
-                    break;
+                    return;
                 case "adm":
-                    switch (button)
-                    {
-                        case "cl":
-                            user.Condition = button;
-                            session.SendMessage("Выберите действие:");
-                            session.SendButtons(GetClientMenuButtons(user));
-                            break;
-                        case "op":
-                            user.Condition = button;
-                            session.SendMessage("Функции открывающего");
-                            break;
-                        case "ad":
-                            user.Condition = button;
-                            session.SendMessage("Выберите действие:");
-                            session.SendButtons(GetAdminButtons());
-                            break;
-                        case "re":
-                            user.Condition = button;
-                            session.SendMessage("Отчетность:");
-                            break;
-                        case "b":
-                            user.Condition = "st";
-                            break;
-                    };
-                    break;
+                    AdmModule(user, session, button);
+                    return;
                 case "ad":
-                    switch (button)
-                    {
-                        case "us":
-                            user.Condition = button;
-                            session.SendButtons(GetAdminUsersButtons());
-                            break;
-                        case "l":
-                            user.Condition = button;
-                            session.SendMessage("Выберите действие:");
-                            session.SendButtons(GetAdminLaundryButtons());
-                            break;
-                        case "n":
-                            user.Condition = button;
-                            session.SendMessage("Выберите запись для отмены:");
-                            break;
-                        case "b":
-                            user.Condition = "adm";
-                            session.SendMessage("Выберите действие:");
-                            session.SendButtons(GetAdminMenuButtons());
-                            break;
-                    };
-                    break;
+                    AdModule(user, session, button);
+                    return;
                 case "us":
-                    {
-                        user.Condition = "usrs";
-                        var listIds = GetUsersIdsList(button);
-                        string stringListIds = GetStringListIds(listIds);
-                        session.SendMessage(stringListIds);
-                        session.SendButtons(GetAdminStatusButtons(user, int.Parse(button)));
-                        break;
-                    }
-                    
+                    UsModule(user, session, button);
+                    return;
                 case "usrs":
-                    switch (button)
-                    {
-                        case "a":
-                            { 
-                                session.SendMessage("Введите id пользователя");
-                                var (id, msg) = session.GetMessage();
-                                var usId = long.Parse(msg);
-                                Data.Users.Add(new User { ID = usId, Status = int.Parse(button) });//проблема с кнопкой
-                                var listIds = GetUsersIdsList(button);
-                                string stringListIds = GetStringListIds(listIds);
-                                session.SendMessage(stringListIds);
-                                session.SendButtons(GetAdminStatusButtons(user, int.Parse(button)));
-                                break;
-                            }
-                        case "d":
-                            {
-                                session.SendMessage("Введите номер пользователя");
-                                var (id, msg) = session.GetMessage();
-                                var num = int.Parse(msg);
-                                var listIds = GetUsersIdsList(button);
-                                string stringListIds = GetStringListIds(listIds);
-                                Data.Users.Find(delegate (User user)
-                                {
-                                    return user.ID == listIds[num];
-                                }).Status = 0;
-                                listIds = GetUsersIdsList(button);
-                                stringListIds = GetStringListIds(listIds);
-                                session.SendMessage(stringListIds);
-                                session.SendButtons(GetAdminStatusButtons(user, int.Parse(button)));
-                                break;
-                            }
-                    }
-                    break;
+                    UsrsModule(user, session, button);
+                    return;
+                case "l":
+                    LModule(user, session, button);
+                    return;
                 case "info":
+                    InfoModule(user, session, button);
+                    return;
                 case "time":
-                case "w":
-                case "but":
-                    break;
-                case "op":
-                    break;
-                case "re":
-                    break;
+                    TimeModule(user, session, button);
+                    return;
             }
             ClientBrunch(user, session, button);
         }
@@ -152,7 +71,7 @@ namespace ChatBotLaundry
                     user.Condition = "cl";
                     session.SendMessage("Выберите действие:");
                     session.SendButtons(GetClientMenuButtons(user));
-                    break;
+                    return;
 
             }
             ClientBrunch(user, session, button);
@@ -166,121 +85,330 @@ namespace ChatBotLaundry
             {
                 case "cl":
                     ClModule(user, session, button);
-                    break;
+                    return;
                 case "cln":
                     ClnModule(user, session, button);
-                    break;
+                    return;
                 case "clnd":
                     ClndModule(user, session, button);
-                    break;
+                    return;
                 case "clndt":
                     ClndtModule(user, session, button);
-                    break;
+                    return;
                 case "cldn":
                     CldnModule(user, session, button);
-                    break;
+                    return;
+                case "l":
+                    LModule(user, session, button);
+                    return;
+                case "info":
+                    InfoModule(user, session, button);
+                    return;
+                case "time":
+                    TimeModule(user, session, button);
+                    return;
             }
         }
 
         //модули диалогов(модули возвращают предыдущее/следующее состояния, выполняют действия)
-        private static void ClndtModule(User user, WebInterface session, string button)
-        {
-            if (button != "b")
-            {
-                user.Condition = "cl";
-                user.note[2] = int.Parse(button);
-                MakeNote(user, user.note[0], user.note[1], user.note[2]);
-                session.SendMessage("Выберите действие:");
-                session.SendButtons(GetClientMenuButtons(user));
-            }
-            else
-            {
-                user.Condition = "clnd";
-                session.SendButtons(GetTimeButtons(user.note[0]));
-            }
-        }
-
-        private static void ClndModule(User user, WebInterface session, string button)
-        {
-            if (button != "b")
-            {
-                user.Condition = "clndt";
-                user.note[1] = int.Parse(button);
-                session.SendButtons(GetAmountButtons(user.note[0], user.note[1]));
-            }
-            else
-            {
-                user.Condition = "cln";
-                session.SendMessage("Запись");
-                session.SendButtons(GetDayButtons(user.Status));
-
-            }
-        }
-
-        private static void ClnModule(User user, WebInterface session, string button)
-        {
-            if (button != "b")
-            {
-                user.Condition = "clnd";
-                user.note[0] = int.Parse(button);
-                session.SendButtons(GetTimeButtons(user.note[0]));
-            }
-            else
-            {
-                user.Condition = "cl";
-                session.SendMessage("Выберите действие:");
-                session.SendButtons(GetClientMenuButtons(user));
-            }
-        }
-
-        private static void ClModule(User user, WebInterface session, string button)
+        private static void AdmModule(User user, WebInterface session, string button)
         {
             switch (button)
             {
-                case "cln":
+                case "cl":
                     user.Condition = button;
-                    session.SendMessage("Запись");
-                    session.SendButtons(GetDayButtons(user.Status));
-                    break;
-                case "cldn":
-                    user.Condition = button;
-                    session.SendMessage("Отмена записи");
-                    session.SendButtons(GetNotesButtons(user));
-                    break;
-                case "clnt":
-                    user.NotificationStatus = !user.NotificationStatus;
-                    if (user.NotificationStatus)
-                        session.SendMessage("Уведомления включены");
-                    else
-                        session.SendMessage("Уведомления выключены");
-                    Thread.Sleep(1000);
                     session.SendMessage("Выберите действие:");
                     session.SendButtons(GetClientMenuButtons(user));
-                    break;
-                case "info":
-                    session.SendMessage("Какая-то важная инфа по стирке...");
-                    Thread.Sleep(1000);
+                    return;
+                case "op":
+                    user.Condition = button;
+                    session.SendMessage("Функции открывающего");
+                    return;
+                case "ad":
+                    user.Condition = button;
                     session.SendMessage("Выберите действие:");
-                    session.SendButtons(GetClientMenuButtons(user));
-                    break;
+                    session.SendButtons(GetAdminButtons());
+                    return;
+                case "re":
+                    user.Condition = button;
+                    session.SendMessage("Отчетность:");
+                    return;
                 case "b":
                     user.Condition = "st";
-                    break;
+                    return;
             };
         }
-
-        private static void CldnModule(User user, WebInterface session, string button)
-        {
-            if (button != "b")
+        
+            private static void ClModule(User user, WebInterface session, string button)
             {
-                var selectedNote = int.Parse(button);
-                RemoveNote(user, selectedNote);
+                switch (button)
+                {
+                    case "cln":
+                        user.Condition = button;
+                        session.SendMessage("Запись");
+                        session.SendButtons(GetDayButtons(user.Status));
+                        break;
+                    case "cldn":
+                        user.Condition = button;
+                        session.SendMessage("Отмена записи");
+                        session.SendButtons(GetNotesButtons(user));
+                        break;
+                    case "clnt":
+                        user.NotificationStatus = !user.NotificationStatus;
+                        if (user.NotificationStatus)
+                            session.SendMessage("Уведомления включены");
+                        else
+                            session.SendMessage("Уведомления выключены");
+                        Thread.Sleep(1000);
+                        session.SendMessage("Выберите действие:");
+                        session.SendButtons(GetClientMenuButtons(user));
+                        break;
+                    case "info":
+                        session.SendMessage(Data.Info);
+                        Thread.Sleep(1000);
+                        session.SendMessage("Выберите действие:");
+                        session.SendButtons(GetClientMenuButtons(user));
+                        break;
+                    case "b":
+                        user.Condition = "st";
+                        break;
+                };
             }
-            user.Condition = "cl";
-            session.SendMessage("Выберите действие:");
-            session.SendButtons(GetClientMenuButtons(user));
+
+                private static void ClnModule(User user, WebInterface session, string button)
+                {
+                    if (button != "b")
+                    {
+                        user.Condition = "clnd";
+                        user.note[0] = int.Parse(button);
+                        session.SendButtons(GetTimeButtons(user.note[0]));
+                    }
+                    else
+                    {
+                        user.Condition = "cl";
+                        session.SendMessage("Выберите действие:");
+                        session.SendButtons(GetClientMenuButtons(user));
+                    }
+                }
+
+                    private static void ClndModule(User user, WebInterface session, string button)
+                    {
+                        if (button != "b")
+                        {
+                            user.Condition = "clndt";
+                            user.note[1] = int.Parse(button);
+                            session.SendButtons(GetAmountButtons(user.note[0], user.note[1]));
+                        }
+                        else
+                        {
+                            user.Condition = "cln";
+                            session.SendMessage("Запись");
+                            session.SendButtons(GetDayButtons(user.Status));
+
+                        }
+                    }
+
+                        private static void ClndtModule(User user, WebInterface session, string button)
+                    {
+                        if (button != "b")
+                        {
+                            user.Condition = "cl";
+                            user.note[2] = int.Parse(button);
+                            MakeNote(user, user.note[0], user.note[1], user.note[2]);
+                            session.SendMessage("Выберите действие:");
+                            session.SendButtons(GetClientMenuButtons(user));
+                        }
+                        else
+                        {
+                            user.Condition = "clnd";
+                            session.SendButtons(GetTimeButtons(user.note[0]));
+                        }
+                    }
+        
+                private static void CldnModule(User user, WebInterface session, string button)
+                {
+                    if (button != "b")
+                    {
+                        var selectedNote = int.Parse(button);
+                        RemoveNote(user, selectedNote);
+                    }
+                    user.Condition = "cl";
+                    session.SendMessage("Выберите действие:");
+                    session.SendButtons(GetClientMenuButtons(user));
+                }
+
+            private static void AdModule(User user, WebInterface session, string button)
+            {
+                switch (button)
+                {
+                    case "us":
+                        user.Condition = button;
+                        session.SendButtons(GetAdminUsersButtons());
+                        return;
+                    case "l":
+                        user.Condition = button;
+                        session.SendMessage("Выберите действие:");
+                        session.SendButtons(GetAdminLaundryButtons());
+                        return;
+                    case "n":
+                        session.SendMessage(GetAllNotesList());
+                        session.SendMessage("Введите номер записи для отмены или напишите \"назад\":");
+                        var msg = session.GetMessage().Item2;
+                        int num;
+                        while (msg != "назад")
+                        {
+                            if (int.TryParse(msg, out num))
+                            {
+                                Data.Notes.RemoveAt(num);
+                                session.SendMessage(GetAllNotesList());
+                            }
+                            session.SendMessage("Введите номер записи для отмены или напишите \"назад\":");
+                            msg = session.GetMessage().Item2;//todo
+                        }
+                        session.SendMessage("Выберите действие:");
+                        session.SendButtons(GetAdminButtons());
+                        return;
+                    case "b":
+                        user.Condition = "adm";
+                        session.SendMessage("Выберите действие:");
+                        session.SendButtons(GetAdminMenuButtons());
+                        return;
+                };
+            }
+
+                private static void UsModule(User user, WebInterface session, string button)
+                {
+                    switch (button)
+                    {
+                        case "b":
+                            user.Condition = "ad";
+                            session.SendMessage("Выберите действие:");
+                            session.SendButtons(GetAdminButtons());
+                            return;
+                        default:
+                            user.Condition = "usrs";
+                            user.adminIdsList = (GetUsersIdsList(button), int.Parse(button));
+                            session.SendMessage(ListToNumerableStringList(user.adminIdsList.Item1));
+                            session.SendButtons(GetAdminStatusButtons(user.adminIdsList.Item2));
+                            return;
+                    };
+                }
+        
+                    private static void UsrsModule(User user, WebInterface session, string button)
+                    {
+                        switch (button)
+                        {
+                            case "a":
+                                session.SendMessage("Введите id пользователя");
+                                var msg = session.GetMessage().Item2;
+                                var usId = long.Parse(msg);
+                                Data.Users.Add(new User { ID = usId, Status = user.adminIdsList.Item2 });
+                                break;
+                            case "d":
+                                session.SendMessage("Введите номер пользователя");
+                                msg = session.GetMessage().Item2;
+                                var num = int.Parse(msg);
+                                Data.Users.Find(delegate (User user)
+                                {
+                                    return user.ID == user.adminIdsList.Item1[num];
+                                }).Status = 0;
+                                break;
+                            case "b":
+                                user.Condition = "us";
+                                session.SendButtons(GetAdminUsersButtons());
+                                return;
+                            default:
+                                return;
+                        }
+                        user.adminIdsList.Item1 = GetUsersIdsList(user.adminIdsList.Item2.ToString());
+                        session.SendMessage(ListToNumerableStringList(user.adminIdsList.Item1));
+                        session.SendButtons(GetAdminStatusButtons(user.adminIdsList.Item2));
+                    }
+
+                private static void LModule(User user, WebInterface session, string button)
+                {
+                    switch (button)
+                    {
+                        case "info":
+                            user.Condition = button;
+                            session.SendMessage(Data.Info);
+                            session.SendMessage("Введите новую информацию о прачке");
+                            Data.NewInfo = session.GetMessage().Item2;
+                            session.SendButtons(GetСonfirmationButtons());
+                            return;
+                        case "time":
+                            user.Condition = button;
+                            session.SendMessage(WashesHoursToString());
+                            session.SendButtons(GetTimeAdButtons());
+                            break;
+                        case "pas":
+                            user.Condition = "l";
+                            session.SendMessage("Введите пароль или напишите \"отмена\":");
+                            var password = session.GetMessage().Item2;
+                            for (var i = 3; i > 0; i--)
+                                if (password == Data.Password)
+                                {
+                                    session.SendMessage("Введите новый пароль");
+                                    Data.Password = session.GetMessage().Item2;
+                                    session.SendMessage("Пароль изменен:");
+                                    Thread.Sleep(3000);
+                                    return;
+                                }
+                                else if(password == "отмена")
+                                {
+                                    session.SendButtons(GetAdminLaundryButtons());
+                                    return;
+                                }
+                                else
+                                {
+                                    session.SendMessage("Вы ввели не правильный пароль\nОсталось " + i.ToString() + " попыток\nВведите пароль или напишите \"отмена\":");
+                                    password = session.GetMessage().Item2;
+                                }
+                            session.SendButtons(GetAdminLaundryButtons());
+                            return;
+                        case "b":
+                            user.Condition = "ad";
+                            session.SendButtons(GetAdminButtons() );
+                            return;
+                    }
+                }
+
+                    private static void TimeModule(User user, WebInterface session, string button)
+        {
+            switch (button)
+            {
+                case "b":
+                    user.Condition = "l";
+                    session.SendMessage("Выберите действие:");
+                    session.SendButtons(GetAdminLaundryButtons());
+                    return;
+            }
+            if (Data.WashesHours.Contains(int.Parse(button)))
+                Data.WashesHours.Remove(int.Parse(button));
+            else
+                Data.WashesHours.Add(int.Parse(button));
+            session.SendMessage(WashesHoursToString());
+            session.SendButtons(GetTimeAdButtons());
         }
 
+                    private static void InfoModule(User user, WebInterface session, string button)
+        {
+            switch (button)
+            {
+                case "save":
+                    Data.Info = Data.NewInfo;
+                    session.SendMessage("Информация изменена");
+                    Thread.Sleep(1000);
+                    break;
+                case "b":
+                    break;
+                default:
+                    return;
+            }
+            user.Condition = "l";
+            session.SendButtons(GetAdminLaundryButtons());
+        }
+        
         //методы клиента
         private static void MakeNote(User user, int selectedDay, int selectedTime, int selectedAmount)
         {
@@ -334,11 +462,11 @@ namespace ChatBotLaundry
             return listIds;
         }
 
-        private static string GetStringListIds(List<long> listIds)
+        private static string ListToNumerableStringList(List<long> list)
         {
             string stringListIds = "";
             var i = 0;
-            foreach (var id in listIds)
+            foreach (var id in list)
             {
                 stringListIds += i.ToString() + " " + id.ToString() + "\n";
                 i++;
@@ -346,7 +474,37 @@ namespace ChatBotLaundry
             return stringListIds;
         }
 
+        private static string WashesHoursToString()
+        {
+            var washesHoursData = "";
+            foreach (var id in Data.WashesHours)
+                washesHoursData += id.ToString() + ":00 \n";
+            return washesHoursData;
+        }
+
+        private static string GetAllNotesList()
+        {
+            var list = "";
+            for (var i = 0; i < Data.Notes.Count; i++)
+            {
+                list += i.ToString() + ' ' + Data.Notes[i].ToString() + "\n";
+            }
+            if (Data.Notes.Count == 0)
+                list = "Нет записей";
+            return list;
+        }
+
+
         //методы получения кнопок
+        private static List<string[]> GetСonfirmationButtons()
+        {
+            var buttons = new List<string[]>();
+            if (Data.NewInfo.Length != 0)
+                buttons.Add(new string[] { "Сохранить изменения" , "save" });
+            buttons.Add(new string[] { "Отмена", "b" });
+            return buttons;
+        }
+
         private static List<string[]> GetAdminLaundryButtons()
         {
             var buttons = new List<string[]> {
@@ -364,21 +522,16 @@ namespace ChatBotLaundry
                                 new[] { "Пользователи", "us" },
                                 new[] { "Прачка", "l" }
                             };
-            if (Data.Notes.Capacity != 0)
+            if (Data.Notes.Count != 0)
                 userAdminButtons.Add(new[] { "Записи", "n" });
             return userAdminButtons;
         }
 
-        //todo
-        private static List<string[]> GetAllNotesButtons()
+        private static List<string[]> GetTimeAdButtons()
         {
-            var notes = Data.Notes;
             var buttons = new List<string[]>();
-            for (var i = 0; i < notes.Count; i++)
-            {
-                var button = new string[] { notes[i].ToString() + "\n", i.ToString() };
-                buttons.Add(button);
-            }
+            for (var t = 8; t < 23; t++)
+                buttons.Add(new[] { t.ToString() + ":00", t.ToString() });
             return buttons;
         }
 
@@ -491,7 +644,7 @@ namespace ChatBotLaundry
             return buttons;
         }
 
-        private static List<string[]> GetAdminStatusButtons(User user, int status)
+        private static List<string[]> GetAdminStatusButtons(int status)
         {
             var buttons = new List<string[]> {
                 new[] { "Добавить", "a" }
@@ -500,6 +653,5 @@ namespace ChatBotLaundry
                 buttons.Add(new[] { "Удалить", "d" });
             return buttons;
         }
-
     }
 }

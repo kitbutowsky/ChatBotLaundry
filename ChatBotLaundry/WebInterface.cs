@@ -16,9 +16,11 @@ namespace ChatBotLaundry
 
         public (long, string) GetMessage()
         {
-            var strs = Console.ReadLine().Split();
+            var strs = Console.ReadLine().Split(separator: ' ');
             var id = long.Parse(strs[0]);
             var message = strs[1];
+            for (var i = 2; i < strs.Length; i++)
+                message += ' ' + strs[i];
             return (id, message);
         }
 
@@ -34,7 +36,7 @@ namespace ChatBotLaundry
             {
                 buttns.Add(button[1] + ". " + button[0]);
             }
-            if (!buttns.Contains("b. Выйти"))
+            if (!buttns.Contains("b. Выйти") && !buttns.Contains("b. Отмена"))
                 buttns.Add( "b.  Назад");
             Console.WriteLine(string.Join(" ", buttns));
         }

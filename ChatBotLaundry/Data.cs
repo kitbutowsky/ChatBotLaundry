@@ -6,7 +6,11 @@ namespace ChatBotLaundry
 {
     class Data
     {
-        public static List<string> Statuses = new List<string> {
+        public static string Info = "Какая-то важная информация... Бла... Бла... Бла...";
+        public static string NewInfo;
+        public static string Password = "admin";
+
+        readonly public static List<string> Statuses = new List<string> {
             "Клиенты",
             "ССК",
             "Открывающие",

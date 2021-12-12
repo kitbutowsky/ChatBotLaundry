@@ -41,9 +41,9 @@ namespace ChatBotLaundry
 
         public override string ToString()
         {
-            return "ID: " + userID.ToString() +
+            return  "ID: " + userID.ToString() +
                     " День: " + date.DayOfWeekR +
-                    " Время: " + Data.WashesHours[time].ToString() +
+                    " Время: " + Data.WashesHours[time].ToString() + ":00 " +
                     " Количество машинок: " + amount.ToString();
         }
     }

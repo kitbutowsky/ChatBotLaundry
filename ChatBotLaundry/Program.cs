@@ -36,7 +36,7 @@ namespace ChatBotLaundry
             thread.Start();
             while (true)
             {
-                Thread.Sleep(100000);
+                Thread.Sleep(1000000);
                 //Console.WriteLine("Запись обновилась");
                 Data.Days.RemoveAt(0);
                 var newDay = new Day
