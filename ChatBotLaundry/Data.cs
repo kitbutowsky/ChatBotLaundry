@@ -25,6 +25,14 @@ namespace ChatBotLaundry
         /// </summary>
         public static List<int> WashesHours = new List<int> { 10, 14, 18, 20 };
 
+        public static string WashesHoursToString()
+        {
+            var washesHoursData = "";
+            foreach (var id in Data.WashesHours)
+                washesHoursData += id.ToString() + ":00 \n";
+            return washesHoursData;
+        }
+
         /// <summary>
         /// список пользователей 
         /// </summary>
@@ -80,5 +88,17 @@ namespace ChatBotLaundry
 
         //список записей
         public static List<TimeNote> Notes = new List<TimeNote>();
+
+        public static string AllNotesToStringList()
+        {
+            var list = "";
+            for (var i = 0; i < Data.Notes.Count; i++)
+            {
+                list += i.ToString() + ' ' + Data.Notes[i].ToString() + "\n";
+            }
+            if (Data.Notes.Count == 0)
+                list = "Нет записей";
+            return list;
+        }
     }
 }

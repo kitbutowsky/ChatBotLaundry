@@ -19,7 +19,6 @@ namespace ChatBotLaundry
                 case 2:
                     break;
                 case 3:
-                    session.SendMessage("Администратор");
                     BotAdmin(user, session, button);
                     break;
                 case 4:
@@ -170,7 +169,16 @@ namespace ChatBotLaundry
                         session.SendButtons(GetClientMenuButtons(user));
                         break;
                     case "b":
-                        user.Condition = "st";
+                        if (user.Status == 3)
+                        {
+                            user.Condition = "adm";
+                            session.SendMessage("Выберите действие:");
+                            session.SendButtons(GetAdminMenuButtons());
+                        }
+                        else
+                        {
+                            user.Condition = "st";
+                        } 
                         break;
                 };
             }
@@ -251,7 +259,7 @@ namespace ChatBotLaundry
                         session.SendButtons(GetAdminLaundryButtons());
                         return;
                     case "n":
-                        session.SendMessage(GetAllNotesList());
+                        session.SendMessage(Data.AllNotesToStringList());
                         session.SendMessage("Введите номер записи для отмены или напишите \"назад\":");
                         var msg = session.GetMessage().Item2;
                         int num;
@@ -260,7 +268,7 @@ namespace ChatBotLaundry
                             if (int.TryParse(msg, out num))
                             {
                                 Data.Notes.RemoveAt(num);
-                                session.SendMessage(GetAllNotesList());
+                                session.SendMessage(Data.AllNotesToStringList());
                             }
                             session.SendMessage("Введите номер записи для отмены или напишите \"назад\":");
                             msg = session.GetMessage().Item2;//todo
@@ -301,17 +309,23 @@ namespace ChatBotLaundry
                             case "a":
                                 session.SendMessage("Введите id пользователя");
                                 var msg = session.GetMessage().Item2;
-                                var usId = long.Parse(msg);
-                                Data.Users.Add(new User { ID = usId, Status = user.adminIdsList.Item2 });
+                                long usId;
+                                if (long.TryParse(msg, out usId))
+                                    Data.Users.Add(new User { ID = usId, Status = user.adminIdsList.Item2 });
+                                else
+                                    session.SendMessage("Некоректный ввод!");
                                 break;
                             case "d":
                                 session.SendMessage("Введите номер пользователя");
                                 msg = session.GetMessage().Item2;
-                                var num = int.Parse(msg);
-                                Data.Users.Find(delegate (User user)
-                                {
-                                    return user.ID == user.adminIdsList.Item1[num];
-                                }).Status = 0;
+                                int num;
+                                if (int.TryParse(msg, out num) && num <= user.adminIdsList.Item1.Count) 
+                                    Data.Users.Find(delegate (User user)
+                                    {
+                                        return user.ID == user.adminIdsList.Item1[num];
+                                    }).Status = 0;
+                                else
+                                    session.SendMessage("Некоректный ввод!");
                                 break;
                             case "b":
                                 user.Condition = "us";
@@ -338,7 +352,7 @@ namespace ChatBotLaundry
                             return;
                         case "time":
                             user.Condition = button;
-                            session.SendMessage(WashesHoursToString());
+                            session.SendMessage(Data.WashesHoursToString());
                             session.SendButtons(GetTimeAdButtons());
                             break;
                         case "pas":
@@ -374,40 +388,43 @@ namespace ChatBotLaundry
                 }
 
                     private static void TimeModule(User user, WebInterface session, string button)
-        {
-            switch (button)
-            {
-                case "b":
-                    user.Condition = "l";
-                    session.SendMessage("Выберите действие:");
-                    session.SendButtons(GetAdminLaundryButtons());
-                    return;
-            }
-            if (Data.WashesHours.Contains(int.Parse(button)))
-                Data.WashesHours.Remove(int.Parse(button));
-            else
-                Data.WashesHours.Add(int.Parse(button));
-            session.SendMessage(WashesHoursToString());
-            session.SendButtons(GetTimeAdButtons());
-        }
+                    {
+                        if (button == "b")
+                        {
+                            user.Condition = "l";
+                            session.SendMessage("Выберите действие:");
+                            session.SendButtons(GetAdminLaundryButtons());
+                            return;
+                        }
+                        if (Data.WashesHours.Contains(int.Parse(button)))
+                            Data.WashesHours.Remove(int.Parse(button));
+                        else
+                        {
+                            Data.WashesHours.Add(int.Parse(button));
+                            Data.WashesHours.Sort();
+                        }
+                            
+                        session.SendMessage(Data.WashesHoursToString());
+                        session.SendButtons(GetTimeAdButtons());
+                    }
 
                     private static void InfoModule(User user, WebInterface session, string button)
-        {
-            switch (button)
-            {
-                case "save":
-                    Data.Info = Data.NewInfo;
-                    session.SendMessage("Информация изменена");
-                    Thread.Sleep(1000);
-                    break;
-                case "b":
-                    break;
-                default:
-                    return;
-            }
-            user.Condition = "l";
-            session.SendButtons(GetAdminLaundryButtons());
-        }
+                    {
+                        switch (button)
+                        {
+                            case "save":
+                                Data.Info = Data.NewInfo;
+                                session.SendMessage("Информация изменена");
+                                Thread.Sleep(1000);
+                                break;
+                            case "b":
+                                break;
+                            default:
+                                return;
+                        }
+                        user.Condition = "l";
+                        session.SendButtons(GetAdminLaundryButtons());
+                    }
         
         //методы клиента
         private static void MakeNote(User user, int selectedDay, int selectedTime, int selectedAmount)
@@ -474,25 +491,6 @@ namespace ChatBotLaundry
             return stringListIds;
         }
 
-        private static string WashesHoursToString()
-        {
-            var washesHoursData = "";
-            foreach (var id in Data.WashesHours)
-                washesHoursData += id.ToString() + ":00 \n";
-            return washesHoursData;
-        }
-
-        private static string GetAllNotesList()
-        {
-            var list = "";
-            for (var i = 0; i < Data.Notes.Count; i++)
-            {
-                list += i.ToString() + ' ' + Data.Notes[i].ToString() + "\n";
-            }
-            if (Data.Notes.Count == 0)
-                list = "Нет записей";
-            return list;
-        }
 
 
         //методы получения кнопок
@@ -614,7 +612,7 @@ namespace ChatBotLaundry
             {
                 clientMenuButtons[^2][0] = "Выкл уведомления";
             }
-            if (user.Status != 2)
+            if (user.Status != 3)
             {
                 clientMenuButtons.Add(new[] { "Выйти", "b" });
             }
