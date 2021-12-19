@@ -23,27 +23,45 @@ namespace ChatBotLaundry
                 message += ' ' + strs[i];
             return (id, message);
         }
-
-        public long GetUserId()
-        {
-            return long.Parse(Console.ReadLine());
-        }
         
-        public void SendButtons(List<string[]> buttons)
+        public void SendButtons(long id, List<List<(string, string)>> buttons)
         {
-            var buttns = new List<string>();
-            foreach (var button in buttons)
+            var toId = "Пользователю: " + id.ToString();
+            var str = "";
+            foreach (var buttns in buttons)
             {
-                buttns.Add(button[1] + ". " + button[0]);
+                foreach (var buttn in buttns)
+                {
+                    str += buttn.Item2 + ". " + buttn.Item1 + " ";
+                }
+                str += "\n";
             }
-            if (!buttns.Contains("b. Выйти") && !buttns.Contains("b. Отмена"))
-                buttns.Add( "b.  Назад");
-            Console.WriteLine(string.Join(" ", buttns));
+            if (!str.Contains("b. Выйти") && !str.Contains("b. Отмена"))
+                str += "b.  Назад";
+            Console.WriteLine("{0}\n{1}", toId, str);
         }
 
-        public void SendMessage(string message)
+        public void SendInlineButtons(long id, List<List<(string, string)>> buttons)
         {
-            Console.WriteLine(message);
+            var toId = "Пользователю: " + id.ToString();
+            var str = "";
+            foreach (var buttns in buttons)
+            {
+                foreach (var buttn in buttns)
+                {
+                    str += buttn.Item2 + ". " + buttn.Item1;
+                }
+                str += "\n";
+            }
+            if (!str.Contains("b. Выйти") && !str.Contains("b. Отмена"))
+                str += "b.  Назад";
+            Console.WriteLine("{0}\n{1}", toId, str);
+        }
+
+        public void SendMessage(long id, string message)
+        {
+            var toId = "Пользователю: " + id.ToString();
+            Console.WriteLine(toId + '\n' + message);
         }
     }
 }
