@@ -11,7 +11,6 @@ namespace ChatBotLaundry
             var strs = new string[2];
             strs = Console.ReadLine().Split();
             var id = long.Parse(strs[0]);
-            
             var button = strs[1];
             var msg = Console.ReadLine();
             return (id, button, msg);
@@ -42,7 +41,7 @@ namespace ChatBotLaundry
             {
                 foreach (var buttn in buttns)
                 {
-                    str += buttn.Item2 + ". " + buttn.Item1;
+                    str += buttn.Item2 + ". " + buttn.Item1 + " ";
                 }
                 str += "\n";
             }
