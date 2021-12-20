@@ -6,22 +6,15 @@ namespace ChatBotLaundry
 {
     class WebInterface : IWebInterface
     {
-        public (long, string) GetButton()
+        public (long, string, string) GetContent()
         {
-            var strs = Console.ReadLine().Split();
+            var strs = new string[2];
+            strs = Console.ReadLine().Split();
             var id = long.Parse(strs[0]);
+            
             var button = strs[1];
-            return (id, button);
-        }
-
-        public (long, string) GetMessage()
-        {
-            var strs = Console.ReadLine().Split(separator: ' ');
-            var id = long.Parse(strs[0]);
-            var message = strs[1];
-            for (var i = 2; i < strs.Length; i++)
-                message += ' ' + strs[i];
-            return (id, message);
+            var msg = Console.ReadLine();
+            return (id, button, msg);
         }
         
         public void SendButtons(long id, List<List<(string, string)>> buttons)

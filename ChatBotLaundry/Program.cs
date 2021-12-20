@@ -11,7 +11,7 @@ namespace ChatBotLaundry
             while (true)
             {
                 var session = new WebInterface();
-                var (id, button) = session.GetButton();
+                var (id, button, msg) = session.GetContent();
                 User user;
                 if (Data.Users.FindIndex(delegate (User usr)
                 {
@@ -26,7 +26,7 @@ namespace ChatBotLaundry
                     {
                         return usr.ID == id;
                     });
-                BotAsynh.BotRun(user, session, button);  
+                BotAsynh.BotRun(user, session, button, msg);  
             }
         }
 

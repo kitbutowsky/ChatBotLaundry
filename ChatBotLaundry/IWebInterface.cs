@@ -25,14 +25,20 @@ namespace ChatBotLaundry
         /// </summary>
         /// <param name="buttons"></param>
         void SendInlineButtons(long id, List<List<(string, string)>> buttons);
+
+
         /// <summary>
         /// отправляет сообщение
         /// принимает id пользователя и сообщение
         /// </summary>
-        /// <param name="buttons"></param>
+        /// <param name="id"></param>
+        /// <param name="message"></param>
         void SendMessage(long id, string message);
 
-        (long, string) GetButton();
-        (long, string) GetMessage();
+        /// <summary>
+        /// принимает контент в виде сообщения или нажатой кнопки
+        /// </summary>
+        /// <returns>id, payload, msg</returns>
+        (long, string, string) GetContent();
     }
 }
