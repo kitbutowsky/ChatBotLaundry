@@ -11,6 +11,7 @@ namespace ChatBotLaundry
         private int status;
         private string condition = "st";
         public int[] note = new [] {0, 0, 0};
+
         /// <summary>
         /// содержит список пользователей и статус пользователей для администрирования
         /// </summary>
