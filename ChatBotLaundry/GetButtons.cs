@@ -2,9 +2,9 @@
 
 namespace ChatBotLaundry
 {
-    //класс получения кнопок
     internal class GetButtons
     {
+        //методы получения кнопок
         internal static List<List<(string, string)>> Adm()
         {
             var buttons = new List<List<(string, string)>> {
@@ -25,7 +25,7 @@ namespace ChatBotLaundry
 
             internal static List<List<(string, string)>> Ad()
             {
-                var buttons = new List<List<(string, string)>>{
+                var userAdminButtons = new List<List<(string, string)>>{
                     new List<(string, string)>
                     {
                         ("Пользователи", "us")
@@ -35,9 +35,11 @@ namespace ChatBotLaundry
                     }
                 };
                 if (Data.Notes.Count != 0)
-                    buttons.Add(new List<(string, string)>{("Записи", "n" )});
-                buttons.Add(new List<(string, string)>{("Назад", "b" )});
-                return buttons;
+                    userAdminButtons.Add(new List<(string, string)>
+                    {
+                        ("Записи", "n" )
+                    });
+                return userAdminButtons;
             }
 
                 internal static List<List<(string, string)>> Us()
@@ -50,8 +52,7 @@ namespace ChatBotLaundry
                         new List<(string, string)>{
                             ("Администраторы", "3"),
                             ("Черный список", "4"),
-                        },
-                        new List<(string, string)>{("Назад", "b" )}
+                        }
                     };
                     return buttons;
                 }
@@ -63,7 +64,6 @@ namespace ChatBotLaundry
                         };
                         if ((Data.AmountOf(status) != 0 && status != 3) || (Data.AmountOf(status) > 1 && status == 3))
                             buttons[0].Add(("Удалить", "del"));
-                        buttons.Add(new List<(string, string)> { ("Назад", "b") });
                         return buttons;
                     }
 
@@ -86,7 +86,6 @@ namespace ChatBotLaundry
                             ("Изменить пароль", "pas")
                         }
                     };
-                    buttons.Add(new List<(string, string)> { ("Назад", "b") });
                     return buttons;
                 }
 
@@ -101,7 +100,6 @@ namespace ChatBotLaundry
                             buttons.Insert(0, new List<(string, string)>
                             { ("Сохранить изменения" , "save")
                             });
-                        buttons.Add(new List<(string, string)> { ("Назад", "b") });
                         return buttons;
                     }
 
@@ -118,13 +116,12 @@ namespace ChatBotLaundry
                             }
                             buttons[i].Add((t.ToString() + ":00", t.ToString()));
                         }
-                        buttons.Add(new List<(string, string)> { ("Назад", "b") });
                         return buttons;
                     }
 
         internal static List<List<(string, string)>> Cl(User user)
         {
-            var buttons = new List<List<(string, string)>> {
+            var clientMenuButtons = new List<List<(string, string)>> {
                 new List<(string, string)>{
                     ("Выкл уведомления", "clnt"),
                     ("FAQ", "info")
@@ -136,31 +133,30 @@ namespace ChatBotLaundry
                 return note.UserID == user.ID;
             }
             ) != -1)
-                buttons.Insert(0, new List<(string, string)> { ("Отмена", "cldn") });
+                clientMenuButtons.Insert(0, new List<(string, string)> { ("Отмена", "cldn") });
             if (Data.Days.FindIndex(delegate (Day day)
             {
                 return (day.EmptySpaces != 0) && (day.AvailableForSSK == (user.Status == 1));
             }
             ) != -1)
-                buttons.Insert(0, new List<(string, string)> { ("Записаться в прачечную", "cln") });
+                clientMenuButtons.Insert(0, new List<(string, string)> { ("Записаться в прачечную", "cln") });
             if (!user.NotificationStatus)
             {
-                var repl = buttons[^1][0];
+                var repl = clientMenuButtons[^1][0];
                 repl.Item1 = "Вкл уведомления";
-                buttons[^1][0] = repl;
+                clientMenuButtons[^1][0] = repl;
             }
             else
             {
-                var repl = buttons[^1][0];
+                var repl = clientMenuButtons[^1][0];
                 repl.Item1 = "Выкл уведомления";
-                buttons[^1][0] = repl;
+                clientMenuButtons[^1][0] = repl;
             }
             if (user.Status != 3 && user.Status != 2)
             {
-                buttons.Add(new List<(string, string)> { ("Выйти", "b") });
+                clientMenuButtons.Add(new List<(string, string)> { ("Выйти", "b") });
             }
-            buttons.Add(new List<(string, string)> { ("Назад", "b") });
-            return buttons;
+            return clientMenuButtons;
         }
 
             internal static List<List<(string, string)>> Cln(int status)
@@ -172,7 +168,6 @@ namespace ChatBotLaundry
                         var button = new List<(string, string)> { (Data.Days[d].DayOfWeekR + " " + Data.Days[d].EmptySpaces.ToString(), d.ToString()) };
                         buttons.Add(button);
                     }
-                buttons.Add(new List<(string, string)> { ("Назад", "b") });
                 return buttons;
             }
 
@@ -187,7 +182,6 @@ namespace ChatBotLaundry
                             buttons.Add(button);
                         }
                     }
-                    buttons.Add(new List<(string, string)> { ("Назад", "b") });
                     return buttons;
                 }
 
@@ -199,7 +193,6 @@ namespace ChatBotLaundry
                             var button = new List<(string, string)> { (i.ToString() + ". ", i.ToString()) };
                             buttons.Add(button);
                         }
-                        buttons.Add(new List<(string, string)> { ("Назад", "b") });
                         return buttons;
                     }
 
@@ -216,13 +209,7 @@ namespace ChatBotLaundry
                     var button = new List<(string, string)> { (notes[i].ToString() + "\n", i.ToString()) };
                     buttons.Add(button);
                 }
-                buttons.Add(new List<(string, string)> { ("Назад", "b") });
                 return buttons;
             }
-
-        internal static List<List<(string, string)>> Back()
-        {
-            return new List<List<(string, string)>> { new List<(string, string)>{ ("Назад", "b") } };
-        }
     }
 }

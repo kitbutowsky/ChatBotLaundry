@@ -28,6 +28,8 @@ namespace ChatBotLaundry
                 }
                 str += "\n";
             }
+            if (!str.Contains("b. Выйти") && !str.Contains("b. Отмена"))
+                str += "b.  Назад";
             Console.WriteLine("{0}\n{1}", toId, str);
         }
 
@@ -43,6 +45,8 @@ namespace ChatBotLaundry
                 }
                 str += "\n";
             }
+            if (!str.Contains("b. Выйти") && !str.Contains("b. Отмена"))
+                str += "b.  Назад";
             Console.WriteLine("{0}\n{1}", toId, str);
         }
 

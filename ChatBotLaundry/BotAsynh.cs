@@ -73,7 +73,7 @@ namespace ChatBotLaundry
                     TimeModule(user, session, button);
                     break;
                 case "n":
-                    NModule(user, session, button, msg);
+                    NModule(user, session, msg);
                     break;
             }
             ClientActions(user, session, button);
@@ -98,20 +98,20 @@ namespace ChatBotLaundry
                 case "add":
                     session.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
                     session.SendMessage(user.ID, "Введите id пользователя");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    session.SendButtons(user.ID, new List<List<(string, string)>>());
                     return;
                 case "del":
                     session.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
                     session.SendMessage(user.ID, "Введите номер пользователя");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    session.SendButtons(user.ID, new List<List<(string, string)>>());
                     return;
                 case "l":
                     session.SendMessage(user.ID, "Выберите действие:");
                     session.SendInlineButtons(user.ID, GetButtons.L());
                     return;
                 case "pas":
+                    session.SendButtons(user.ID, new List<List<(string, string)>>());
                     session.SendMessage(user.ID, "Введите пароль:");
-                    session.SendButtons(user.ID, GetButtons.Back());
                     return;
                 case "newpas":
                     session.SendMessage(user.ID, "Введите новый пароль");
@@ -119,7 +119,7 @@ namespace ChatBotLaundry
                 case "infad":
                     session.SendMessage(user.ID, Data.Info);
                     session.SendMessage(user.ID, "Введите новую информацию о прачке");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    session.SendButtons(user.ID, new List<List<(string, string)>>());
                     return;
                 case "infadc":
                     session.SendInlineButtons(user.ID, GetButtons.Infadc());
@@ -130,8 +130,7 @@ namespace ChatBotLaundry
                     return;
                 case "n":
                     session.SendMessage(user.ID, Data.AllNotesToStringList());
-                    session.SendMessage(user.ID, "Введите номер записи для отмены:");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    session.SendMessage(user.ID, "Введите номер записи для отмены или напишите \"назад\":");
                     return;
             }
             //для клиента
@@ -466,31 +465,31 @@ namespace ChatBotLaundry
         //todo
                     private static void PasModule(User user, WebInterface session, string button, string msg)
                     {
-                        if (button == "b" || user.PasswordTries == 0)
+                        if (button == "b")
                             user.Condition = "l";
                         else if (msg == Data.Password)
                             user.Condition = "newpas";
                         else
                         {
-                            user.PasswordTries--;
-                            session.SendMessage(user.ID, "Вы ввели не правильный пароль\nОсталось " + user.PasswordTries.ToString() + " попыток");
+                            Data.PasswordTries--;
+                            session.SendMessage(user.ID, "Вы ввели не правильный пароль\nОсталось " + Data.PasswordTries.ToString() + " попыток");
                         }
                     }
 
                         private static void NewPasModule(User user, WebInterface session, string msg)
                         {
                             user.Condition = "l";
-                            user.PasswordTries = 3;
+                            Data.PasswordTries = 3;
                             Data.Password = msg;
                             session.SendMessage(user.ID, "Пароль изменен!");
                             session.SendMessage(user.ID, "Новый пароль: " + Data.Password.ToString());
                             Thread.Sleep(3000);
                         }
 
-                private static void NModule(User user, WebInterface session, string button, string msg)
+        private static void NModule(User user, WebInterface session, string msg)
                 {
                     int num;
-                    if (button != "b")
+                    if (msg != "назад")
                     {
                         if (int.TryParse(msg, out num))
                         {
