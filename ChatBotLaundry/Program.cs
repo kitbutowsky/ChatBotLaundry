@@ -26,7 +26,13 @@ namespace ChatBotLaundry
                     {
                         return usr.ID == id;
                     });
-                BotAsynh.BotRun(user, session, button, msg);  
+                if (user.Blocked.Item1)
+                {
+                    session.SendMessage(user.ID, "Вы временно заблокированны");
+                    session.SendMessage(user.ID, "Время до конца блокировки");
+                }
+                else
+                    BotAsynh.BotRun(user, session, button, msg);  
             }
         }
 

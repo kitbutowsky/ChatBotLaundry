@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace ChatBotLaundry
 {
@@ -233,53 +234,22 @@ namespace ChatBotLaundry
 
         public static void UsModule(User user, WebInterface session, string button)
         {
+            Predicate<User> condition;
             switch (button)
             {
                 case "b":
                     user.Condition = "ad";
                     return;
+                case "bl":
+                    user.Condition = "usrs";
+                    condition = delegate (User us) { return us.Blocked.Item1; };
+                    break;
                 default:
                     user.Condition = "usrs";
-                    user.adminIdsList = (BotAsynh.GetUsersIdsList(button), int.Parse(button));
-                    return;
+                    condition = delegate (User us) { return us.Status == int.Parse(button); };
+                    break;
             };
-        }
-
-        public static void UsrsAddModule(User user, WebInterface session, string button, string msg)
-        {
-            if (button == "b")
-            {
-                user.Condition = "usrs";
-                return;
-            }
-            if (long.TryParse(msg, out long usId))
-            {
-                Data.Users.Add(new User { ID = usId, Status = user.adminIdsList.Item2 });
-                user.Condition = "usrs";
-                user.adminIdsList.Item1.Add(usId);
-            }
-            else
-                session.SendMessage(user.ID, "Некоректный ввод! повторите попытку");
-        }
-
-        public static void UsrsDelModule(User user, WebInterface session, string button, string msg)
-        {
-            if (button == "b")
-            {
-                user.Condition = "usrs";
-                return;
-            }
-            if (int.TryParse(msg, out int num) && num <= user.adminIdsList.Item1.Count)
-            {
-                Data.Users.Find(delegate (User usr)
-                {
-                    return usr.ID == user.adminIdsList.Item1[num];
-                }).Status = 0;
-                user.adminIdsList.Item1.RemoveAt(num);
-                user.Condition = "usrs";
-            }
-            else
-                session.SendMessage(user.ID, "Некоректный ввод! повторите попытку");
+            user.adminIdsList = (BotAsynh.GetUsersIdsList(condition), button);
         }
 
         public static void UsrsModule(User user, WebInterface session, string button)
@@ -296,7 +266,53 @@ namespace ChatBotLaundry
                     user.Condition = "us";
                     return;
             }
-            user.adminIdsList.Item1 = BotAsynh.GetUsersIdsList(user.adminIdsList.Item2.ToString());
+        }
+
+        public static void UsrsAddModule(User user, WebInterface session, string button, string msg)
+        {
+            if (button == "b")
+            {
+                user.Condition = "usrs";
+                return;
+            }
+            if (long.TryParse(msg, out long usId))
+            {
+                user.Condition = "usrs";
+                if (user.adminIdsList.Item2 == "bl")
+                {
+                    Data.Users.Find(delegate (User usr){return usr.ID == usId;}).Blocked = (true, DateTime.Now);
+                } 
+                else
+                    Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
+                user.adminIdsList.Item1.Add(usId);
+            }
+            else
+                session.SendMessage(user.ID, "Некоректный ввод! повторите попытку");
+        }
+
+        public static void UsrsDelModule(User user, WebInterface session, string button, string msg)
+        {
+            if (button == "b")
+            {
+                user.Condition = "usrs";
+                return;
+            }
+            if (int.TryParse(msg, out int num) && num <= user.adminIdsList.Item1.Count)
+            {
+                if (user.adminIdsList.Item2 == "bl")
+                {
+                    Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; }).Blocked = (false, DateTime.Now);
+                }
+                else
+                    Data.Users.Find(delegate (User usr)
+                    {
+                        return usr.ID == user.adminIdsList.Item1[num];
+                    }).Status = 0;
+                user.adminIdsList.Item1.RemoveAt(num);
+                user.Condition = "usrs";
+            }
+            else
+                session.SendMessage(user.ID, "Некоректный ввод! повторите попытку");
         }
     }
 }

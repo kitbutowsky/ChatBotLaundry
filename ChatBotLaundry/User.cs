@@ -12,11 +12,11 @@ namespace ChatBotLaundry
         private string condition = "st";
         public int[] note = new [] {0, 0, 0};
         public int PasswordTries = 3;
-
+        public (bool, DateTime) Blocked;
         /// <summary>
         /// содержит список пользователей и статус пользователей для администрирования
         /// </summary>
-        public (List<long>, int) adminIdsList;
+        public (List<long>, string) adminIdsList;
 
         /// <summary>
         /// 1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный, по умолчанию 0 - клиент

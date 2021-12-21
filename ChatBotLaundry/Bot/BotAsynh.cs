@@ -10,6 +10,7 @@ namespace ChatBotLaundry
     {
         public static void BotRun(User user, WebInterface session, string button, string msg)
         {
+            
             switch (user.Status)
             {
                 case 0:
@@ -20,10 +21,6 @@ namespace ChatBotLaundry
                     break;
                 case 3:
                     BotAdmin(user, session, button, msg);
-                    break;
-                case 4:
-                    session.SendMessage(user.ID, "Вы временно заблокированны");
-                    session.SendMessage(user.ID, "Время до конца блокировки");
                     break;
             }
         }
@@ -253,12 +250,12 @@ namespace ChatBotLaundry
         }
 
         //методы админа
-        internal static List<long> GetUsersIdsList(string buttonClicked1)
+        internal static List<long> GetUsersIdsList(Predicate<User> condition)
         {
-            var listIds = new List<long>();
-            foreach (var userCategory in Data.Users)
-                if (userCategory.Status == int.Parse(buttonClicked1))
-                    listIds.Add(userCategory.ID);
+            var listUsers = Data.Users.FindAll(condition);
+            List<long> listIds = new List<long>();
+            foreach (var usr in listUsers)
+                listIds.Add(usr.ID);
             return listIds;
         }
 

@@ -49,20 +49,35 @@ namespace ChatBotLaundry
                         },
                         new List<(string, string)>{
                             ("Администраторы", "3"),
-                            ("Черный список", "4"),
+                            ("Черный список", "bl"),
                         },
                         new List<(string, string)>{("Назад", "b" )}
                     };
                     return buttons;
                 }
 
-                    internal static List<List<(string, string)>> Usrs(int status)
+                    internal static List<List<(string, string)>> Usrs(string status)
                     {
-                        var buttons = new List<List<(string, string)>> {
-                            new List<(string, string)>{("Добавить", "add") }
-                        };
-                        if ((Data.AmountOf(status) != 0 && status != 3) || (Data.AmountOf(status) > 1 && status == 3))
-                            buttons[0].Add(("Удалить", "del"));
+                        List<List< (string, string) >> buttons = new List<List<(string, string)>>();
+                        if (int.TryParse(status, out var stts))
+                        {
+                            buttons.Add(
+                                new List<(string, string)>{("Добавить", "add") }
+                            );
+                            var amount = 0;
+                            foreach (var user in Data.Users)
+                                if (user.Status == stts) amount++;
+                            if ((amount != 0 && stts != 3) || (amount > 1 && stts == 3))
+                                buttons[0].Add(("Удалить", "del"));
+                        }
+                        else
+                        {
+                            var amount = 0;
+                            foreach (var user in Data.Users)
+                                if (user.Blocked.Item1) amount++;
+                            if (amount != 0)
+                                buttons.Add(new List<(string, string)> { ("Удалить", "del") });
+                        }
                         buttons.Add(new List<(string, string)> { ("Назад", "b") });
                         return buttons;
                     }
