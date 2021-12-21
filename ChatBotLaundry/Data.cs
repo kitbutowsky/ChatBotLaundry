@@ -10,7 +10,6 @@ namespace ChatBotLaundry
         public static string NewInfo;
 
         public static string Password = "admin";
-        public static int PasswordTries = 3;
 
 
         readonly public static List<string> Statuses = new List<string> {

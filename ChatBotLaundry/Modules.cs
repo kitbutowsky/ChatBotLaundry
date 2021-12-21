@@ -178,17 +178,17 @@ namespace ChatBotLaundry
         public static void NewPasModule(User user, WebInterface session, string msg)
         {
             user.Condition = "l";
-            Data.PasswordTries = 3;
+            user.PasswordTries = 3;
             Data.Password = msg;
             session.SendMessage(user.ID, "Пароль изменен!");
             session.SendMessage(user.ID, "Новый пароль: " + Data.Password.ToString());
             Thread.Sleep(3000);
         }
 
-        public static void NModule(User user, WebInterface session, string msg)
+        public static void NModule(User user, WebInterface session, string button, string msg)
         {
             int num;
-            if (msg != "назад")
+            if (button != "b")
             {
                 if (int.TryParse(msg, out num))
                 {
@@ -210,8 +210,8 @@ namespace ChatBotLaundry
                 user.Condition = "newpas";
             else
             {
-                Data.PasswordTries--;
-                session.SendMessage(user.ID, "Вы ввели не правильный пароль\nОсталось " + Data.PasswordTries.ToString() + " попыток");
+                user.PasswordTries--;
+                session.SendMessage(user.ID, "Вы ввели не правильный пароль\nОсталось " + user.PasswordTries.ToString() + " попыток");
             }
         }
 
