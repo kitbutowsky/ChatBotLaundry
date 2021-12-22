@@ -57,8 +57,13 @@ namespace ChatBotLaundry
         }
         /// <summary>
         /// Таблица записи одного дня
-        /// Принимает значения ID [время, количесво машинок] 
+        /// ID[время, количесво машинок] 
         /// </summary>
         public long[,] HoursWashesTable;
+        /// <summary>
+        /// Таблица распределений открытий прачки одного дня
+        /// ID[время] 
+        /// </summary>
+        public long[] HoursWashesOpenerTable;
     }
 }

@@ -10,6 +10,8 @@ namespace ChatBotLaundry
         {
             while (true)
             {
+                Console.WriteLine(Data.WashesHoursToString());
+                Console.WriteLine(Data.WashesOpenerHours);
                 var session = new WebInterface();
                 var (id, button, msg) = session.GetContent();
                 User user;
@@ -48,7 +50,8 @@ namespace ChatBotLaundry
                 var newDay = new Day
                 {
                     Date = DateTime.UtcNow,
-                    HoursWashesTable = new long[Data.WashesHours.Count, Data.WashesAmount]
+                    HoursWashesTable = new long[Data.WashesHours.Count, Data.WashesAmount],
+                    HoursWashesOpenerTable = new long[Data.WashesOpenerHours.Count]
                 };
                 Data.Days.Add(newDay);
             }

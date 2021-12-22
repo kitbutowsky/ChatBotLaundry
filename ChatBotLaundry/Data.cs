@@ -11,13 +11,6 @@ namespace ChatBotLaundry
 
         public static string Password = "admin";
 
-
-        readonly public static List<string> Statuses = new List<string> {
-            "Клиенты",
-            "ССК",
-            "Открывающие",
-            "Админы",
-            "Черный список" };
         /// <summary>
         /// Количество машинок
         /// </summary>
@@ -26,6 +19,21 @@ namespace ChatBotLaundry
         /// Время по которым работают машинки
         /// </summary>
         public static List<int> WashesHours = new List<int> { 10, 14, 18, 20 };
+        public static List<int> WashesOpenerHours{
+            get
+            {
+                var washesOpenerHours = new List<int>();
+                for (var i = 0; i < WashesHours.Count - 1; i++)
+                {
+                    washesOpenerHours.Add(WashesHours[i]);
+                    if (WashesHours[i + 1] - WashesHours[i] > 2)
+                        washesOpenerHours.Add(WashesHours[i]+2); 
+                }
+                washesOpenerHours.Add(WashesHours[^1]);
+                washesOpenerHours.Add(WashesHours[^1] + 2);
+                return washesOpenerHours;
+            }
+        }
 
         public static string WashesHoursToString()
         {
@@ -33,25 +41,6 @@ namespace ChatBotLaundry
             foreach (var id in Data.WashesHours)
                 washesHoursData += id.ToString() + ":00 \n";
             return washesHoursData;
-        }
-
-        /// <summary>
-        /// список пользователей 
-        /// </summary>
-        public static List<User> Users = new List<User>{
-            new User{ID = 1, Status = 3},
-            new User{ID = 2, Status = 1},
-            new User{ID = 3, Status = 1},
-        };
-        /// <summary>
-        /// возвращает количество людей определенного статуса (1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный)
-        /// </summary>
-        public static int AmountOf(int status)
-        { 
-            var count = 0;
-            foreach (var user in Users)
-                if (user.Status == status) count++;
-            return count;
         }
 
         /// <summary>
@@ -102,5 +91,32 @@ namespace ChatBotLaundry
                 list = "Нет записей";
             return list;
         }
+
+        readonly public static List<string> Statuses = new List<string> {
+            "Клиенты",
+            "ССК",
+            "Открывающие",
+            "Админы",
+            "Черный список" };
+
+        /// <summary>
+        /// список пользователей 
+        /// </summary>
+        public static List<User> Users = new List<User>{
+            new User{ID = 1, Status = 3},
+            new User{ID = 2, Status = 1, Blocked = (true, DateTime.Now)},
+            new User{ID = 3, Status = 1},
+        };
+        /// <summary>
+        /// возвращает количество людей определенного статуса (1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный)
+        /// </summary>
+        public static int AmountOf(int status)
+        { 
+            var count = 0;
+            foreach (var user in Users)
+                if (user.Status == status) count++;
+            return count;
+        }
+
     }
 }
