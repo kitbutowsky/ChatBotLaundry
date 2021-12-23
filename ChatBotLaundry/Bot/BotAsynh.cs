@@ -217,36 +217,33 @@ namespace ChatBotLaundry
                                     selectedAmount
                                     );
             //добавляет запись в список записей
-            Data.Notes.Add(note);
+            Data.Days[selectedDay].Notes.Add(note);
             //ищет первую свободную ячейку
             var i = 0;
-            while (Data.Days[note.DayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
+            while (Data.Days[note.dayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
             //записывает ID note.Amount раз
             for (var j = i; j < note.Amount + i; j++)
-                Data.Days[note.DayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
+                Data.Days[note.dayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
         }
 
-        internal static void RemoveNote(User user, int selectedNote)
+        internal static void RemoveNote(long id, int selectedNote, List<TimeNote> notes)
         {
-            var notes = Data.Notes.FindAll(delegate (TimeNote note)
-            {
-                return note.UserID == user.ID;
-            });
             var amount = notes[selectedNote].Amount;
-            var dayIndex = Data.Days.FindIndex(delegate (Day day)
+            //ищет индекс дня в списке дней для удаления записи
+            var index = Data.Days.FindIndex(delegate (Day day)
             {
                 return day.Date == notes[selectedNote].Day.Date;
             });
             for (var i = 0; i < Data.WashesAmount; i++)
             {
-                if (Data.Days[dayIndex].HoursWashesTable[notes[selectedNote].Time, i] == user.ID
+                if (Data.Days[index].HoursWashesTable[notes[selectedNote].Time, i] == id
                     && amount != 0)
                 {
-                    Data.Days[dayIndex].HoursWashesTable[notes[selectedNote].Time, i] = 0;
+                    Data.Days[index].HoursWashesTable[notes[selectedNote].Time, i] = 0;
                     amount -= 1;
                 }
             }
-            Data.Notes.Remove(notes[selectedNote]);
+            Data.Days[index].Notes.Remove(notes[selectedNote]);
         }
 
         //методы админа
@@ -269,6 +266,30 @@ namespace ChatBotLaundry
                 i++;
             }
             return stringListIds;
+        }
+        /// <summary>
+        /// возвращает список записей для пользователя id или все записи 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="all"></param>
+        /// <returns></returns>
+        internal static List<TimeNote> GetNotes(long id, bool all = false)
+        {
+            var notes = new List<TimeNote>();
+            var dayIndex = 0;
+            foreach (var day in Data.Days)
+            {
+                foreach (var note in day.Notes)
+                {
+                    note.dayForNotation = dayIndex;
+                    if (note.UserID == id || all)
+                    {
+                        notes.Add(note);
+                    }
+                }
+                dayIndex++;
+            }
+            return notes;
         }
     }
 }

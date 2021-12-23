@@ -7,7 +7,7 @@ namespace ChatBotLaundry
     //Класс записи в праченую
     public class TimeNote
     {
-        private int dayForNotation;
+        public int dayForNotation;
         private Day date;
         private long userID;
         private int time;
@@ -31,13 +31,6 @@ namespace ChatBotLaundry
             this.date = Data.Days[dayForNotation];
         }
 
-        public bool Empty
-        {
-            get
-            {
-                return (userID == 0);
-            }
-        }
 
         public override string ToString()
         {

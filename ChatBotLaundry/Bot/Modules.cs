@@ -51,15 +51,6 @@ namespace ChatBotLaundry
             };
         }
 
-        internal static void CldnModule(User user, WebInterface session, string button)
-        {
-            if (button != "b")
-            {
-                var selectedNote = int.Parse(button);
-                BotAsynh.RemoveNote(user, selectedNote);
-            }
-            user.Condition = "cl";
-        }
 
         public static void ClModule(User user, WebInterface session, string button)
         {
@@ -127,6 +118,17 @@ namespace ChatBotLaundry
                 user.Condition = "cl";
         }
 
+        internal static void CldnModule(User user, WebInterface session, string button)
+        {
+            if (button != "b")
+            {
+                var selectedNote = int.Parse(button);
+                var notes = BotAsynh.GetNotes(user.ID);
+                BotAsynh.RemoveNote(user.ID, selectedNote, notes);
+            }
+            user.Condition = "cl";
+        }
+
         public static void InfAdCModule(User user, WebInterface session, string button)
         {
             switch (button)
@@ -188,16 +190,15 @@ namespace ChatBotLaundry
 
         public static void NModule(User user, WebInterface session, string button, string msg)
         {
-            int num;
             if (button != "b")
             {
-                if (int.TryParse(msg, out num))
+                if (int.TryParse(msg, out int selectedNote))
                 {
-                    Data.Notes.RemoveAt(num);
-                    session.SendMessage(user.ID, Data.AllNotesToStringList());
+                    var notes = BotAsynh.GetNotes(user.ID, true);
+                    BotAsynh.RemoveNote(user.ID, selectedNote, notes);
                 }
                 else
-                    session.SendMessage(user.ID, Data.AllNotesToStringList());
+                    session.SendMessage(user.ID, "Ошибка ввода!");
             }
             else
                 user.Condition = "ad";

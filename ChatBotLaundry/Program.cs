@@ -10,8 +10,6 @@ namespace ChatBotLaundry
         {
             while (true)
             {
-                Console.WriteLine(Data.WashesHoursToString());
-                Console.WriteLine(Data.WashesOpenerHours);
                 var session = new WebInterface();
                 var (id, button, msg) = session.GetContent();
                 User user;

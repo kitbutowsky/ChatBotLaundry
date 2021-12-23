@@ -26,32 +26,20 @@ namespace ChatBotLaundry
             internal static List<List<(string, string)>> Ad()
             {
                 var buttons = new List<List<(string, string)>>{
-                    new List<(string, string)>
-                    {
-                        ("Пользователи", "us")
-                    },
-                    new List<(string, string)>{
-                        ("Прачка", "l")
-                    }
+                    new List<(string, string)>{( "Пользователи", "us" )},
+                    new List<(string, string)>{( "Прачка", "l" )},
+                    new List<(string, string)>{( "Записи", "n" )},
+                    new List<(string, string)>{( "Назад", "b" )}
                 };
-                if (Data.Notes.Count != 0)
-                    buttons.Add(new List<(string, string)>{("Записи", "n" )});
-                buttons.Add(new List<(string, string)>{("Назад", "b" )});
                 return buttons;
             }
 
                 internal static List<List<(string, string)>> Us()
                 {
                     var buttons = new List<List<(string, string)>> {
-                        new List<(string, string)>{
-                            ("ССК", "1"),
-                            ("Открывающие", "2")
-                        },
-                        new List<(string, string)>{
-                            ("Администраторы", "3"),
-                            ("Черный список", "bl"),
-                        },
-                        new List<(string, string)>{("Назад", "b" )}
+                        new List<(string, string)>{ ( "ССК", "1" ), ( "Открывающие", "2" ) },
+                        new List<(string, string)>{ ( "Администраторы", "3" ), ( "Черный список", "bl" ) },
+                        new List<(string, string)>{ ( "Назад", "b" ) }
                     };
                     return buttons;
                 }
@@ -61,9 +49,7 @@ namespace ChatBotLaundry
                         List<List< (string, string) >> buttons = new List<List<(string, string)>>();
                         if (int.TryParse(status, out var stts))
                         {
-                            buttons.Add(
-                                new List<(string, string)>{("Добавить", "add") }
-                            );
+                            buttons.Add( new List<(string, string)>{ ( "Добавить", "add" ) });
                             var amount = 0;
                             foreach (var user in Data.Users)
                                 if (user.Status == stts) amount++;
@@ -146,9 +132,12 @@ namespace ChatBotLaundry
                 }
             };
 
-            if (Data.Notes.FindIndex(delegate (TimeNote note)
+            if (Data.Days.FindIndex(delegate (Day day)
             {
-                return note.UserID == user.ID;
+                foreach (var note in day.Notes)
+                    if (note.UserID == user.ID)
+                        return true;
+                return false;
             }
             ) != -1)
                 buttons.Insert(0, new List<(string, string)> { ("Отмена", "cldn") });
@@ -220,11 +209,7 @@ namespace ChatBotLaundry
 
             internal static List<List<(string, string)>> Cldn(User user)
             {
-                var notes = Data.Notes.FindAll(delegate (TimeNote note)
-                {
-                    return note.UserID == user.ID;
-                }
-                );
+                var notes = BotAsynh.GetNotes(user.ID, true);
                 var buttons = new List<List<(string, string)>>();
                 for (var i = 0; i < notes.Count; i++)
                 {

@@ -44,6 +44,10 @@ namespace ChatBotLaundry
         }
 
         /// <summary>
+        ///список всех дней записи
+        /// </summary>
+        public static List<Day> NotesArh;
+        /// <summary>
         ///список дней записи
         /// </summary>
         public static List<Day> Days = new List<Day>{
@@ -77,17 +81,16 @@ namespace ChatBotLaundry
             }
         };
 
-        //список записей
-        public static List<TimeNote> Notes = new List<TimeNote>();
 
         public static string AllNotesToStringList()
         {
             var list = "";
-            for (var i = 0; i < Data.Notes.Count; i++)
-            {
-                list += i.ToString() + ' ' + Data.Notes[i].ToString() + "\n";
-            }
-            if (Data.Notes.Count == 0)
+            foreach (var day in Days)
+                for (var i = 0; i < day.Notes.Count; i++)
+                {
+                    list += i.ToString() + ' ' + day.Notes[i].ToString() + "\n";
+                }
+            if (list == "")
                 list = "Нет записей";
             return list;
         }

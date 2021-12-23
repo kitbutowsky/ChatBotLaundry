@@ -55,6 +55,11 @@ namespace ChatBotLaundry
                 return false;
             }
         }
+
+        /// <summary>
+        /// список записей
+        /// </summary>
+        public List<TimeNote> Notes = new List<TimeNote>();
         /// <summary>
         /// Таблица записи одного дня
         /// ID[время, количесво машинок] 
