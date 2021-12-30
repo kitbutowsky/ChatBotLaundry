@@ -10,8 +10,7 @@ namespace ChatBotLaundry
         {
             while (true)
             {
-                var session = new WebInterface();
-                var (id, button, msg) = session.GetContent();
+                var (id, button, msg) = WebInterface.GetContent();
                 User user;
                 if (Data.Users.FindIndex(delegate (User usr)
                 {
@@ -28,11 +27,11 @@ namespace ChatBotLaundry
                     });
                 if (user.Blocked.Item1)
                 {
-                    session.SendMessage(user.ID, "Вы временно заблокированны");
-                    session.SendMessage(user.ID, "Время до конца блокировки");
+                    WebInterface.SendMessage(user.ID, "Вы временно заблокированны");
+                    WebInterface.SendMessage(user.ID, "Время до конца блокировки");
                 }
                 else
-                    BotAsynh.BotRun(user, session, button, msg);  
+                    BotAsynh.BotRun(user, button, msg);  
             }
         }
 

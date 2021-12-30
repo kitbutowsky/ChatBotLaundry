@@ -6,26 +6,26 @@ using static ChatBotLaundry.Program;
 
 namespace ChatBotLaundry
 {
-    class BotAsynh : Modules
+    class BotAsynh 
     {
-        public static void BotRun(User user, WebInterface session, string button, string msg)
+        public static void BotRun(User user, string button, string msg)
         {
             
             switch (user.Status)
             {
                 case 0:
                 case 1:
-                    BotClient(user, session, button, msg);
+                    BotClient(user, button, msg);
                     break;
                 case 2:
                     break;
                 case 3:
-                    BotAdmin(user, session, button, msg);
+                    BotAdmin(user, button, msg);
                     break;
             }
         }
 
-        public static void BotAdmin(User user, WebInterface session, string button, string msg)
+        public static void BotAdmin(User user, string button, string msg)
         {
             //Выполнение действий по нажатию кнопки
             switch (user.Condition)
@@ -34,114 +34,106 @@ namespace ChatBotLaundry
                     user.Condition = "adm";
                     break;
                 case "adm":
-                    AdmModule(user, session, button);
+                    Modules.Adm(user, button);
                     break;
                 case "ad":
-                    AdModule(user, session, button);
+                    Modules.Ad(user, button);
                     break;
                 case "us":
-                    UsModule(user, session, button);
+                    Modules.Us(user, button);
                     break;
                 case "usrs":
-                    UsrsModule(user, session, button);
+                    Modules.Usrs(user, button);
                     break;
                 case "add":
-                    UsrsAddModule(user, session, button, msg);
+                    Modules.UsrsAdd(user, button, msg);
                     break;
                 case "del":
-                    UsrsDelModule(user, session, button, msg);
+                    Modules.UsrsDel(user, button, msg);
                     break;
                 case "l":
-                    LModule(user, session, button);
+                    Modules.L(user, button);
                     break;
                 case "pas":
-                    PasModule(user, session, button, msg);
+                    Modules.Pas(user, button, msg);
                     break;
                 case "newpas":
-                    NewPasModule(user, session, msg);
+                    Modules.NewPas(user, msg);
                     break;
                 case "infad":
-                    InfAdModule(user, session, button, msg);
+                    Modules.InfAd(user, button, msg);
                     break;
                 case "infadc":
-                    InfAdCModule(user, session, button);
+                    Modules.InfAdC(user, button);
                     break;
                 case "time":
-                    TimeModule(user, session, button);
+                    Modules.Time(user, button);
                     break;
                 case "n":
-                    NModule(user, session, button, msg);
+                    Modules.N(user, button, msg);
                     break;
             }
-            ClientActions(user, session, button);
+            ClientActions(user, button);
+            OpenerActions(user, button);
             //отправление сообщений и кнопок по состоянию
             switch (user.Condition)
             {
                 case "adm":
-                    session.SendMessage(user.ID, "Выберите действие:");
-                    session.SendInlineButtons(user.ID, GetButtons.Adm());
+                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Adm());
                     return;
                 case "ad":
-                    session.SendMessage(user.ID, "Выберите действие:");
-                    session.SendInlineButtons(user.ID, GetButtons.Ad());
+                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Ad());
                     return;
                 case "us":
-                    session.SendInlineButtons(user.ID, GetButtons.Us());
+                    WebInterface.SendButtons(user.ID, "Выберите класс пользователя:", GetButtons.Us());
                     return;
                 case "usrs":
-                    session.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
-                    session.SendInlineButtons(user.ID, GetButtons.Usrs(user.adminIdsList.Item2));
+                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.adminIdsList.Item1), GetButtons.Usrs(user.adminIdsList.Item2));
                     return;
                 case "add":
-                    session.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
-                    session.SendMessage(user.ID, "Введите id пользователя");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
+                    WebInterface.SendButtons(user.ID, "Введите id пользователя", GetButtons.Back());
                     return;
                 case "del":
-                    session.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
-                    session.SendMessage(user.ID, "Введите номер пользователя");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
+                    WebInterface.SendButtons(user.ID, "Введите номер пользователя", GetButtons.Back());
                     return;
                 case "l":
-                    session.SendMessage(user.ID, "Выберите действие:");
-                    session.SendInlineButtons(user.ID, GetButtons.L());
+                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.L());
                     return;
                 case "pas":
-                    session.SendMessage(user.ID, "Введите пароль:");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    WebInterface.SendButtons(user.ID, "Введите пароль:", GetButtons.Back());
                     return;
                 case "newpas":
-                    session.SendMessage(user.ID, "Введите новый пароль");
+                    WebInterface.SendMessage(user.ID, "Введите новый пароль");
                     return;
                 case "infad":
-                    session.SendMessage(user.ID, Data.Info);
-                    session.SendMessage(user.ID, "Введите новую информацию о прачке");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    WebInterface.SendMessage(user.ID, Data.Info);
+                    WebInterface.SendButtons(user.ID, "Введите новую информацию о прачке", GetButtons.Back());
                     return;
                 case "infadc":
-                    session.SendInlineButtons(user.ID, GetButtons.Infadc());
+                    WebInterface.SendButtons(user.ID, "Подтверждение", GetButtons.Infadc());
                     return;
                 case "time":
-                    session.SendMessage(user.ID, Data.WashesHoursToString());
-                    session.SendButtons(user.ID, GetButtons.Time());
+                    WebInterface.SendButtons(user.ID, Data.WashesHoursToString(), GetButtons.Time());
                     return;
                 case "n":
-                    session.SendMessage(user.ID, Data.AllNotesToStringList());
-                    session.SendMessage(user.ID, "Введите номер записи для отмены:");
-                    session.SendButtons(user.ID, GetButtons.Back());
+                    WebInterface.SendMessage(user.ID, Data.AllNotesToStringList());
+                    WebInterface.SendButtons(user.ID, "Введите номер записи для отмены:", GetButtons.Back());
                     return;
             }
             //для клиента
-            ClientButtonsSender(user, session);
+            OpenerButtonsSender(user);
+            ClientButtonsSender(user);
         }
 
 
-        public static void BotClient(User user, WebInterface session, string button, string msg)
+        public static void BotClient(User user, string button, string msg)
         {
             if (user.Status == 0 && user.Condition == "cl" && msg == Data.Password)
             {
                 user.Status = 1;
-                session.SendMessage(user.ID, "Теперь вы сск!");
+                WebInterface.SendMessage(user.ID, "Теперь вы сск!");
             }
             switch (user.Condition)
             {
@@ -149,59 +141,97 @@ namespace ChatBotLaundry
                     user.Condition = "cl";
                     break;
             }
-            ClientActions(user, session, button);
-            ClientButtonsSender(user, session);
+            ClientActions(user, button);
+            ClientButtonsSender(user);
         }
 
 
         //Модули действий(реакции на нажатые кнопки)
-        private static void ClientActions(User user, WebInterface session, string button)
+        private static void OpenerActions(User user, string button)
+        {
+            switch (user.Condition)
+            {
+                case "op":
+                    Modules.Op(user, button);
+                    break;
+                case "opd":
+                    Modules.Opd(user, button);
+                    break;
+                case "ddn":
+                    Modules.Odn(user, button);
+                    break;
+                case "opt":
+                    Modules.Opt(user, button);
+                    break;
+                case "optd":
+                    Modules.Optd(user, button);
+                    break;
+            }
+        }
+
+        private static void ClientActions(User user, string button)
         {
             switch (user.Condition)
             {
                 case "cl":
-                    ClModule(user, session, button);
+                    Modules.Cl(user, button);
                     break;
                 case "cln":
-                    ClnModule(user, session, button);
+                    Modules.Cln(user, button);
                     break;
                 case "clnd":
-                    ClndModule(user, session, button);
+                    Modules.Clnd(user, button);
                     break;
                 case "clndt":
-                    ClndtModule(user, session, button);
+                    Modules.Clndt(user, button);
                     break;
                 case "cldn":
-                    CldnModule(user, session, button);
+                    Modules.Cldn(user, button);
                     break;
             }
         }
 
         //Модули отправки кнопок(отправка кнопок в зависимости от состояния)
-        internal static void ClientButtonsSender(User user, WebInterface session)
+        private static void OpenerButtonsSender(User user)
         {
             switch (user.Condition)
             {
-                case "st":
-                    session.SendButtons(user.ID, new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                case "op":
+                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Op(user));
                     return;
+                case "opd":
+                    WebInterface.SendButtons(user.ID, "Все ли пришли?", new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    return;
+                case "ddn":
+                    WebInterface.SendButtons(user.ID, ""/*нумерованный список пришедших людей*/ ,new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    return;
+                case "opt":
+                    WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    return;
+                case "optd":
+                    WebInterface.SendButtons(user.ID, "Выберите удобное время открытия", new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    return;
+            }
+        }
+
+        internal static void ClientButtonsSender(User user)
+        {
+            switch (user.Condition)
+            {
                 case "cl":
-                    session.SendMessage(user.ID, "Выберите действие:");
-                    session.SendButtons(user.ID, GetButtons.Cl(user));
+                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Cl(user));
                     return;
                 case "cln":
-                    session.SendMessage(user.ID, "Запись");
-                    session.SendButtons(user.ID, GetButtons.Cln(user.Status));
+                    WebInterface.SendButtons(user.ID, "Выберите день недели:", GetButtons.Cln(user.Status));
                     return;
                 case "clnd":
-                    session.SendButtons(user.ID, GetButtons.Clnd(user.note[0]));
+                    WebInterface.SendButtons(user.ID, "Выберите время:", GetButtons.Clnd(user.note[0]));
                     return;
                 case "clndt":
-                    session.SendButtons(user.ID, GetButtons.Clndt(user.note[0], user.note[1]));
+                    WebInterface.SendButtons(user.ID, "Выберите количество машинок:", GetButtons.Clndt(user.note[0], user.note[1]));
                     return;
                 case "cldn":
-                    session.SendMessage(user.ID, "Отмена записи");
-                    session.SendButtons(user.ID, GetButtons.Cldn(user));
+                    WebInterface.SendButtons(user.ID, "Отмена записи", GetButtons.Cldn(user));
                     return;
             }
         }
