@@ -8,13 +8,13 @@ namespace ChatBotLaundry
     public class TimeNote
     {
         public int dayForNotation;
-        private Day date;
+        private DateTime date;
         private long userID;
         private int time;
         private int amount;
 
         public int DayForNotation { get { return dayForNotation; } }
-        public Day Day { get { return date; } }
+        public DateTime Day { get { return date; } }
         public long UserID { get { return userID; } }
         public int Time { get { return time; } }
         public int Amount { get { return amount; } }
@@ -28,15 +28,15 @@ namespace ChatBotLaundry
             this.dayForNotation = dayForNotation;
             this.time = time;
             this.amount = amount;
-            this.date = Data.Days[dayForNotation];
+            this.date = Data.Days[dayForNotation].Date;
         }
 
 
         public override string ToString()
         {
             return  "ID: " + userID.ToString() +
-                    " День: " + date.DayOfWeekR +
-                    " Время: " + Data.WashesHours[time].ToString() + ":00 " +
+                    " День: " + StaticDataAndMetods.DayOfWeekR(date) +
+                    " Время: " + Data.WashesHoursInTimezone[time].ToString() + ":00 " +
                     " Количество машинок: " + amount.ToString();
         }
     }

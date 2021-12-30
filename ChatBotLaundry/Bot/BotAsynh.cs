@@ -158,7 +158,7 @@ namespace ChatBotLaundry
                     Modules.Opd(user, button);
                     break;
                 case "ddn":
-                    Modules.Odn(user, button);
+                    Modules.Ddn(user, button);
                     break;
                 case "opt":
                     Modules.Opt(user, button);
@@ -200,16 +200,16 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Op(user));
                     return;
                 case "opd":
-                    WebInterface.SendButtons(user.ID, "Все ли пришли?", new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    WebInterface.SendButtons(user.ID, "Все ли пришли?", GetButtons.Opd(user));
                     return;
                 case "ddn":
-                    WebInterface.SendButtons(user.ID, ""/*нумерованный список пришедших людей*/ ,new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.OpenerIdsList), GetButtons.Ddn(user));
                     return;
                 case "opt":
-                    WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", GetButtons.Opt(user));
                     return;
                 case "optd":
-                    WebInterface.SendButtons(user.ID, "Выберите удобное время открытия", new List<List<(string, string)>> { new List<(string, string)> { ("Начать", "st") } });
+                    WebInterface.SendButtons(user.ID, "Выберите удобное время открытия", GetButtons.Optd(user));
                     return;
             }
         }
@@ -286,13 +286,34 @@ namespace ChatBotLaundry
             return listIds;
         }
 
+        internal static List<long> GetOpenerIdsList()
+        {
+            var day = Data.Days.Find(delegate (Day day)
+            {
+                return day.Date.Date == DateTime.Now.Date;
+            });
+            var timeIndex = day.WashesHours.FindIndex(delegate (int time)
+            {
+                var now = DateTime.UtcNow.Hour;
+                for (var i = 0; i < 3; i++)
+                    if (time == now - i)
+                        return true;
+                return false;
+            });
+            List<long> listIds = new List<long>();
+            for (var a = 0; a < Data.WashesAmount; a++)
+                if (!listIds.Contains(day.HoursWashesTable[timeIndex, a]))
+                    listIds.Add(day.HoursWashesTable[timeIndex, a]);
+            return listIds;
+        }
+
         internal static string ListToNumerableStringList(List<long> list)
         {
             string stringListIds = "";
             var i = 0;
             foreach (var id in list)
             {
-                stringListIds += i.ToString() + " " + id.ToString() + "\n";
+                stringListIds += i.ToString() + " https://vk.com/im?" + id.ToString() + "\n";
                 i++;
             }
             return stringListIds;
@@ -321,5 +342,6 @@ namespace ChatBotLaundry
             }
             return notes;
         }
+
     }
 }

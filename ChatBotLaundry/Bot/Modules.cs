@@ -14,6 +14,7 @@ namespace ChatBotLaundry
                     user.Condition = button;
                     return;
                 case "op":
+                    user.Condition = button;
                     WebInterface.SendMessage(user.ID, "Функции открывающего");
                     return;
                 case "ad":
@@ -189,11 +190,16 @@ namespace ChatBotLaundry
                             user.Condition = "l";
                             return;
                         }
-                        if (Data.WashesHours.Contains(int.Parse(button)))
-                            Data.WashesHours.Remove(int.Parse(button));
+                        var newtime = int.Parse(button) - StaticDataAndMetods.Timezone;
+                        if (newtime <= 0)
+                        {
+                            newtime += 24;
+                        }
+                        if (Data.WashesHours.Contains(newtime))
+                            Data.WashesHours.Remove(newtime);
                         else
                         {
-                            Data.WashesHours.Add(int.Parse(button));
+                            Data.WashesHours.Add(newtime);
                             Data.WashesHours.Sort();
                         }
                     }
@@ -222,21 +228,22 @@ namespace ChatBotLaundry
                         }
 
                 public static void N(User user, string button, string msg)
-            {
-                if (button != "b")
                 {
-                    if (int.TryParse(msg, out int selectedNote))
+                    if (button != "b")
                     {
-                        var notes = BotAsynh.GetNotes(user.ID, true);
-                        BotAsynh.RemoveNote(user.ID, selectedNote, notes);
+                        if (int.TryParse(msg, out int selectedNote))
+                        {
+                            var notes = BotAsynh.GetNotes(user.ID, true);
+                            BotAsynh.RemoveNote(user.ID, selectedNote, notes);
+                        }
+                        else
+                            WebInterface.SendMessage(user.ID, "Ошибка ввода!");
                     }
                     else
-                        WebInterface.SendMessage(user.ID, "Ошибка ввода!");
+                        user.Condition = "ad";
                 }
-                else
-                    user.Condition = "ad";
-            }
 
+            //функции клиента
             public static void Cl(User user, string button)
             {
                 switch (button)
@@ -284,24 +291,24 @@ namespace ChatBotLaundry
                 }
 
                     public static void Clnd(User user, string button)
-                {
-                    if (button != "b")
-                        user.Condition = "clndt";
-                    else
-                        user.Condition = "cln";
-                }
+                    {
+                        if (button != "b")
+                            user.Condition = "clndt";
+                        else
+                            user.Condition = "cln";
+                    }
 
                         public static void Clndt(User user, string button)
-                {
-                    if (button != "b")
-                    {
-                        user.Condition = "cl";
-                        user.note[2] = int.Parse(button);
-                        BotAsynh.MakeNote(user, user.note[0], user.note[1], user.note[2]);
-                    }
-                    else
-                        user.Condition = "clnd";
-                }
+                        {
+                            if (button != "b")
+                            {
+                                user.Condition = "cl";
+                                user.note[2] = int.Parse(button);
+                                BotAsynh.MakeNote(user, user.note[0], user.note[1], user.note[2]);
+                            }
+                            else
+                                user.Condition = "clnd";
+                        }
 
                 public static void Cldn(User user, string button)
                 {
@@ -314,39 +321,84 @@ namespace ChatBotLaundry
                     user.Condition = "cl";
                 }
 
+        //функции открывающего
         public static void Op(User user, string button)
         {
             switch (button)
             {
-                case "cln":
+                case "opd":
                     user.Condition = button;
                     break;
-                case "cldn":
+                case "opt":
                     user.Condition = button;
-                    break;
-                case "clnt":
-                    user.NotificationStatus = !user.NotificationStatus;
-                    if (user.NotificationStatus)
-                        WebInterface.SendMessage(user.ID, "Уведомления включены");
-                    else
-                        WebInterface.SendMessage(user.ID, "Уведомления выключены");
-                    Thread.Sleep(1000);
-                    break;
-                case "info":
-                    WebInterface.SendMessage(user.ID, Data.Info);
-                    Thread.Sleep(1000);
-                    break;
-                case "b":
-                    if (user.Status == 3)
-                    {
-                        user.Condition = "adm";
-                    }
-                    else
-                    {
-                        user.Condition = "st";
-                    }
                     break;
             };
         }
+
+            public static void Opd(User user, string button)
+            {
+                switch (button)
+                {
+                    case "allcm":
+                        //пришли все создание отметки и времени открытия
+                        user.Condition = "op";
+                        break;
+                    case "ddn":
+                        user.Condition = button;
+                        user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
+                        break;
+                    case "b":
+                        user.Condition = "op";
+                        user.OpenerIdsList.Clear();
+                        break;
+                };
+            }
+                //todo
+                public static void Ddn(User user, string button)
+                {
+                    switch (button)
+                    {
+                        case "op":
+                            user.Condition = button;
+                            break;
+                        case "ddn":
+                            user.Condition = button;
+                            user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
+                            break;
+                    };
+                }
+            //todo
+            public static void Opt(User user, string button)
+            {
+                switch (button)
+                {
+                    case "allcm":
+                        //пришли все создание отметки и времени открытия
+                        user.Condition = "op";
+                        break;
+                    case "ddn":
+                        user.Condition = button;
+                        user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
+                        break;
+                    case "b":
+                        user.Condition = "op";
+                        user.OpenerIdsList.Clear();
+                        break;
+                };
+            }
+                //todo
+                public static void Optd(User user, string button)
+                {
+                    switch (button)
+                    {
+                        case "op":
+                            user.Condition = button;
+                            break;
+                        case "ddn":
+                            user.Condition = button;
+                            user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
+                            break;
+                    };
+                }
     }
 }

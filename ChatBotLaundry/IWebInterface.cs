@@ -4,11 +4,14 @@ using System.Text;
 
 namespace ChatBotLaundry
 {
+    /// <summary>
+    /// класс реализуемого интерфейса должен быть статическим
+    /// </summary>
     interface IWebInterface
     {
         /// <summary>
         /// отправляет стандартное отображение кнопок и их значения
-        /// принимает id пользователя и список списков кортежей
+        /// принимает id пользователя, список списков кортежей и сообщение
         /// внутренний список - кнопки в ряд
         /// внешний список - ряды кнопок 
         /// или по нормальному список рядов кнопок
@@ -16,16 +19,7 @@ namespace ChatBotLaundry
         /// https://dev.vk.com/api/bots/development/keyboard
         /// </summary>
         /// <param name="buttons"></param>
-        void SendButtons(long id, List<List<(string, string)>> buttons);
-        /// <summary>
-        /// отправляет In-line кнопки и их значения
-        /// принимает id пользователя и список рядов кнопок
-        /// в кнопке первое значение - текст кнопки(label), второе значение - то что кнопка возрващает при нажатии(payload)
-        /// https://dev.vk.com/api/bots/development/keyboard
-        /// </summary>
-        /// <param name="buttons"></param>
-        void SendInlineButtons(long id, List<List<(string, string)>> buttons);
-
+        void SendButtons(long id, string message, List<List<(string, string)>> buttons);
 
         /// <summary>
         /// отправляет сообщение
@@ -34,11 +28,5 @@ namespace ChatBotLaundry
         /// <param name="id"></param>
         /// <param name="message"></param>
         void SendMessage(long id, string message);
-
-        /// <summary>
-        /// принимает контент в виде сообщения или нажатой кнопки
-        /// </summary>
-        /// <returns>id, payload, msg</returns>
-        (long, string, string) GetContent();
     }
 }

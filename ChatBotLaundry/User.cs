@@ -9,17 +9,23 @@ namespace ChatBotLaundry
     {
         public long ID;
         private int status;
+        public (bool, DateTime) Blocked;
+        //служебные поля
         private string condition = "st";
         public int[] note = new [] {0, 0, 0};
+        public int[] opnote = new[] { 0, 0 };
         public int PasswordTries = 3;
-        public (bool, DateTime) Blocked;
         /// <summary>
         /// содержит список пользователей и статус пользователей для администрирования
         /// </summary>
         public (List<long>, string) adminIdsList;
+        /// <summary>
+        /// содержит список пользователей и статус пользователей для открывающего
+        /// </summary>
+        public List<long> OpenerIdsList;
 
         /// <summary>
-        /// 1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный, по умолчанию 0 - клиент
+        /// 1 - сск, 2 - открывающий, 3 - админ, по умолчанию 0 - клиент
         /// </summary>
         public int Status{ get { return status; } set { status = value; } }
 

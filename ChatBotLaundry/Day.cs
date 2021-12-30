@@ -9,9 +9,44 @@ namespace ChatBotLaundry
     /// </summary>
     public class Day
     {
-        readonly string[] dayOfWeekRussian = new[] {  "Воскресенье","Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота" };
+        //время записи для этого дня
+        public List<int> WashesHours;
+        public List<int> WashesHoursInTimezone
+        {
+            get
+            {
+                var washesHoursInTimezone = new List<int>();
+                foreach (var time in WashesHours)
+                {
+                    var newtime = time + StaticDataAndMetods.Timezone;
+                    if (newtime >= 24)
+                    {
+                        newtime -= 24;
+                    }
+                    washesHoursInTimezone.Add(newtime);
+                }
+                return washesHoursInTimezone;
+            }
+        }
+        public  List<int> WashesOpenerHours
+        {
+            get
+            {
+                var washesOpenerHours = new List<int>();
+                for (var i = 0; i < WashesHoursInTimezone.Count - 1; i++)
+                {
+                    washesOpenerHours.Add(WashesHoursInTimezone[i]);
+                    if (WashesHoursInTimezone[i + 1] - WashesHoursInTimezone[i] > 2)
+                        washesOpenerHours.Add(WashesHoursInTimezone[i] + 2);
+                }
+                washesOpenerHours.Add(WashesHoursInTimezone[^1]);
+                washesOpenerHours.Add(WashesHoursInTimezone[^1] + 2);
+                return washesOpenerHours;
+            }
+        }
+
+
         public DateTime Date;
-        public string DayOfWeekR { get { return dayOfWeekRussian[(int)Date.DayOfWeek]; } }
         public bool AvailableForSSK { get { return Date.DayOfWeek == DayOfWeek.Sunday || Date.DayOfWeek == DayOfWeek.Wednesday; } }
         /// <summary>
         /// возвращает количество свободных ячеек
@@ -45,11 +80,24 @@ namespace ChatBotLaundry
         /// <summary>
         /// если есть хотябы одна свободная ячейка возвращает true
         /// </summary>
-        public bool IsFree
+        public bool IsEmpty
         {
             get
             {
                 foreach (var a in HoursWashesTable)
+                    if (a == 0)
+                        return true;
+                return false;
+            }
+        }
+        /// <summary>
+        /// если есть хотябы одна свободная ячейка возвращает true
+        /// </summary>
+        public bool IsEmptyOpener
+        {
+            get
+            {
+                foreach (var a in HoursWashesOpenerTable)
                     if (a == 0)
                         return true;
                 return false;

@@ -41,14 +41,16 @@ namespace ChatBotLaundry
             thread.Start();
             while (true)
             {
-                Thread.Sleep(1000000);
-                //Console.WriteLine("Запись обновилась");
+                Thread.Sleep(100000);
+                Console.WriteLine("Запись обновилась");
+                Data.DaysArhive.Add(Data.Days[0]);
                 Data.Days.RemoveAt(0);
                 var newDay = new Day
                 {
                     Date = DateTime.UtcNow,
                     HoursWashesTable = new long[Data.WashesHours.Count, Data.WashesAmount],
-                    HoursWashesOpenerTable = new long[Data.WashesOpenerHours.Count]
+                    HoursWashesOpenerTable = new long[Data.WashesOpenerHours.Count],
+                    WashesHours = Data.WashesHours
                 };
                 Data.Days.Add(newDay);
             }
