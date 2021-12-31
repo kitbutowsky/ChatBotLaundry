@@ -36,28 +36,45 @@ namespace ChatBotLaundry
                 return washesHoursInTimezone;
             }
         }
+        public static List<int> WashesOpenerHours
+        {
+            get
+            {
+                var washesOpenerHours = new List<int>();
+                for (var i = 0; i < WashesHours.Count - 1; i++)
+                {
+                    washesOpenerHours.Add(WashesHours[i]);
+                    if (WashesHours[i + 1] - WashesHours[i] > 2)
+                        washesOpenerHours.Add(WashesHours[i] + 2);
+                }
+                washesOpenerHours.Add(WashesHours[^1]);
+                washesOpenerHours.Add(WashesHours[^1] + 2);
+                return washesOpenerHours;
+            }
+        }
+        public static List<int> WashesOpenerHoursInTimezone
+        {
+            get
+            {
+                var washesOpenerHoursInTimezone = new List<int>();
+                foreach (var time in WashesOpenerHours)
+                {
+                    var newtime = time + StaticDataAndMetods.Timezone;
+                    if (newtime >= 24)
+                    {
+                        newtime -= 24;
+                    }
+                    washesOpenerHoursInTimezone.Add(newtime);
+                }
+                return washesOpenerHoursInTimezone;
+            }
+        }
         public static string WashesHoursToString()
         {
             var washesHoursData = "";
             foreach (var time in WashesHoursInTimezone)
                 washesHoursData += time.ToString() + ":00 \n";
             return washesHoursData;
-        }
-        public static List<int> WashesOpenerHours
-        {
-            get
-            {
-                var washesOpenerHours = new List<int>();
-                for (var i = 0; i < WashesHoursInTimezone.Count - 1; i++)
-                {
-                    washesOpenerHours.Add(WashesHoursInTimezone[i]);
-                    if (WashesHoursInTimezone[i + 1] - WashesHoursInTimezone[i] > 2)
-                        washesOpenerHours.Add(WashesHoursInTimezone[i] + 2);
-                }
-                washesOpenerHours.Add(WashesHoursInTimezone[^1]);
-                washesOpenerHours.Add(WashesHoursInTimezone[^1] + 2);
-                return washesOpenerHours;
-            }
         }
 
         /// <summary>
@@ -105,9 +122,9 @@ namespace ChatBotLaundry
                 HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
             },
             new Day(){
-                Date = new DateTime(2021, 11, 21),
+                Date = new DateTime(2021, 12, 31),
                 HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
-                WashesHours = new List<int> { 5, 8, 11, 14 },
+                WashesHours = new List<int> { 5, 7, 11, 14 },
                 HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
             }
         };
@@ -138,8 +155,9 @@ namespace ChatBotLaundry
         /// </summary>
         public static List<User> Users = new List<User>{
             new User{ID = 1, Status = 3},
-            new User{ID = 2, Status = 1, Blocked = (true, DateTime.Now)},
+            new User{ID = 2, Status = 1, Blocked = (true, DateTime.UtcNow, 4)},
             new User{ID = 3, Status = 1},
+            new User{ID = 4, Status = 2},
         };
         /// <summary>
         /// возвращает количество людей определенного статуса (1 - сск, 2 - открывающий, 3 - админ, 4 - заблокированный)

@@ -16,9 +16,6 @@ namespace ChatBotLaundry
                 new List<(string, string)>{
                     ("Администрирование", "ad"),
                     ("Отчетность", "re")
-                },
-                new List<(string, string)>{
-                    ("Выйти", "b")
                 }
             };
             return buttons;
@@ -48,6 +45,7 @@ namespace ChatBotLaundry
                     internal static List<List<(string, string)>> Usrs(string status)
                     {
                         List<List< (string, string) >> buttons = new List<List<(string, string)>>();
+                        //если работа с классами доступа
                         if (int.TryParse(status, out var stts))
                         {
                             buttons.Add( new List<(string, string)>{ ( "Добавить", "add" ) });
@@ -57,6 +55,7 @@ namespace ChatBotLaundry
                             if ((amount != 0 && stts != 3) || (amount > 1 && stts == 3))
                                 buttons[0].Add(("Удалить", "del"));
                         }
+                        //если работа с заблокированными пользователями
                         else
                         {
                             var amount = 0;
@@ -227,18 +226,18 @@ namespace ChatBotLaundry
                 return d.Date.Date == DateTime.UtcNow.Date;
             });
             //смотрит сегодняшний день и если есть время открытия на это время показывает кнопку
+            var now = DateTime.UtcNow.Hour;
             if (today != null)
-                if (today.WashesOpenerHours.Contains(DateTime.UtcNow.Hour))
+                if (today.WashesOpenerHours.Contains(now))
                     buttons.Add(new List<(string, string)> { ("Открыл", "opd") });
-            buttons.Add(new List<(string, string)> { ("Открыл", "opd") });
-            if (user.Status == 2)
-                buttons.Add(new List<(string, string)> { ("Функции клиента", "cl") });
             if (Data.Days.FindIndex(delegate (Day day)
             {
                 return day.IsEmptyOpener;
             }
             ) != -1)
-                buttons.Insert(0, new List<(string, string)> { ("Время открытия", "cln") });
+                buttons.Add(new List<(string, string)> { ("Время открытия", "opt") });
+            if (user.Status == 2)
+                buttons.Add(new List<(string, string)> { ("Функции клиента", "cl") });
             if (user.Status == 3)
             {
                 buttons.Add(new List<(string, string)> { ("Выйти", "b") });

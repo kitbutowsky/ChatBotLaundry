@@ -15,7 +15,6 @@ namespace ChatBotLaundry
                     return;
                 case "op":
                     user.Condition = button;
-                    WebInterface.SendMessage(user.ID, "Функции открывающего");
                     return;
                 case "ad":
                     user.Condition = button;
@@ -98,11 +97,7 @@ namespace ChatBotLaundry
                             if (long.TryParse(msg, out long usId))
                             {
                                 user.Condition = "usrs";
-                                if (user.adminIdsList.Item2 == "bl")
-                                {
-                                    Data.Users.Find(delegate (User usr){return usr.ID == usId;}).Blocked = (true, DateTime.Now);
-                                } 
-                                else
+                                if (user.adminIdsList.Item2 != "bl")
                                     Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
                                 user.adminIdsList.Item1.Add(usId);
                             }
@@ -121,8 +116,11 @@ namespace ChatBotLaundry
                             {
                                 if (user.adminIdsList.Item2 == "bl")
                                 {
-                                    Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; }).Blocked = (false, DateTime.Now);
-                                }
+                                    var us = Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; }).Blocked;
+                                    us.Item1 = false;
+                                    us.Item2 = new DateTime(0,0,0); 
+                                    us.Item3--;
+                }
                                 else
                                     Data.Users.Find(delegate (User usr)
                                     {
@@ -267,15 +265,16 @@ namespace ChatBotLaundry
                         Thread.Sleep(1000);
                         break;
                     case "b":
-                        if (user.Status == 3)
+                        switch (user.Status)
                         {
-                            user.Condition = "adm";
+                            case 3:
+                                user.Condition = "adm";
+                                break;
+                            case 2:
+                                user.Condition = "op";
+                                break;
                         }
-                        else
-                        {
-                            user.Condition = "st";
-                        }
-                        break;
+                    break;  
                 };
             }
 
@@ -324,15 +323,8 @@ namespace ChatBotLaundry
         //функции открывающего
         public static void Op(User user, string button)
         {
-            switch (button)
-            {
-                case "opd":
-                    user.Condition = button;
-                    break;
-                case "opt":
-                    user.Condition = button;
-                    break;
-            };
+            if (button != "st" && button != "")
+                user.Condition = button;
         }
 
             public static void Opd(User user, string button)

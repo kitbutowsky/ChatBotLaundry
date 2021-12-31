@@ -34,7 +34,7 @@ namespace ChatBotLaundry
                 }
                 str += "\n";
             }
-            Console.WriteLine("{0}\n{1}", toId, str);
+            Console.WriteLine("{0}", str);
         }
 
 

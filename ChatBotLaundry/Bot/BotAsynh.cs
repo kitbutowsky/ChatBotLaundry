@@ -18,6 +18,7 @@ namespace ChatBotLaundry
                     BotClient(user, button, msg);
                     break;
                 case 2:
+                    BotOpener(user, button, msg);
                     break;
                 case 3:
                     BotAdmin(user, button, msg);
@@ -88,14 +89,14 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите класс пользователя:", GetButtons.Us());
                     return;
                 case "usrs":
-                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.adminIdsList.Item1), GetButtons.Usrs(user.adminIdsList.Item2));
+                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, "пользователей"), GetButtons.Usrs(user.adminIdsList.Item2));
                     return;
                 case "add":
-                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, "пользователей"));
                     WebInterface.SendButtons(user.ID, "Введите id пользователя", GetButtons.Back());
                     return;
                 case "del":
-                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1));
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, "пользователей"));
                     WebInterface.SendButtons(user.ID, "Введите номер пользователя", GetButtons.Back());
                     return;
                 case "l":
@@ -127,6 +128,21 @@ namespace ChatBotLaundry
             ClientButtonsSender(user);
         }
 
+        public static void BotOpener(User user, string button, string msg)
+        {
+            //Выполнение действий по нажатию кнопки
+            switch (user.Condition)
+            {
+                case "st":
+                    user.Condition = "op";
+                    break;
+            }
+            OpenerActions(user, button);
+            ClientActions(user, button);
+            //отправление сообщений и кнопок по состоянию
+            OpenerButtonsSender(user);
+            ClientButtonsSender(user);
+        }
 
         public static void BotClient(User user, string button, string msg)
         {
@@ -197,13 +213,13 @@ namespace ChatBotLaundry
             switch (user.Condition)
             {
                 case "op":
-                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Op(user));
+                    WebInterface.SendButtons(user.ID, "Функции открывающего:", GetButtons.Op(user));
                     return;
                 case "opd":
                     WebInterface.SendButtons(user.ID, "Все ли пришли?", GetButtons.Opd(user));
                     return;
                 case "ddn":
-                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.OpenerIdsList), GetButtons.Ddn(user));
+                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.OpenerIdsList, "записанных"), GetButtons.Ddn(user));
                     return;
                 case "opt":
                     WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", GetButtons.Opt(user));
@@ -307,13 +323,13 @@ namespace ChatBotLaundry
             return listIds;
         }
 
-        internal static string ListToNumerableStringList(List<long> list)
+        internal static string ListToNumerableStringList(List<long> list, string ob)
         {
-            string stringListIds = "";
+            string stringListIds = "Список" + ob + "\n";
             var i = 0;
             foreach (var id in list)
             {
-                stringListIds += i.ToString() + " https://vk.com/im?" + id.ToString() + "\n";
+                stringListIds += i.ToString() + " https://vk.com/im?sel=" + id.ToString() + "\n";
                 i++;
             }
             return stringListIds;

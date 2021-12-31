@@ -9,7 +9,10 @@ namespace ChatBotLaundry
     {
         public long ID;
         private int status;
-        public (bool, DateTime) Blocked;
+        /// <summary>
+        /// статус блокировки, время блокировки и количество нарушений
+        /// </summary>
+        public (bool, DateTime, int) Blocked = (false, DateTime.UtcNow, 0);
         //служебные поля
         private string condition = "st";
         public int[] note = new [] {0, 0, 0};

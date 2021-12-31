@@ -28,23 +28,39 @@ namespace ChatBotLaundry
                 return washesHoursInTimezone;
             }
         }
-        public  List<int> WashesOpenerHours
+        public List<int> WashesOpenerHours
         {
             get
             {
                 var washesOpenerHours = new List<int>();
-                for (var i = 0; i < WashesHoursInTimezone.Count - 1; i++)
+                for (var i = 0; i < WashesHours.Count - 1; i++)
                 {
-                    washesOpenerHours.Add(WashesHoursInTimezone[i]);
-                    if (WashesHoursInTimezone[i + 1] - WashesHoursInTimezone[i] > 2)
-                        washesOpenerHours.Add(WashesHoursInTimezone[i] + 2);
+                    washesOpenerHours.Add(WashesHours[i]);
+                    if (WashesHours[i + 1] - WashesHours[i] > 2)
+                        washesOpenerHours.Add(WashesHours[i] + 2);
                 }
-                washesOpenerHours.Add(WashesHoursInTimezone[^1]);
-                washesOpenerHours.Add(WashesHoursInTimezone[^1] + 2);
+                washesOpenerHours.Add(WashesHours[^1]);
+                washesOpenerHours.Add(WashesHours[^1] + 2);
                 return washesOpenerHours;
             }
         }
-
+        public List<int> WashesOpenerHoursInTimezone
+        {
+            get
+            {
+                var washesOpenerHoursInTimezone = new List<int>();
+                foreach (var time in WashesOpenerHours)
+                {
+                    var newtime = time + StaticDataAndMetods.Timezone;
+                    if (newtime >= 24)
+                    {
+                        newtime -= 24;
+                    }
+                    washesOpenerHoursInTimezone.Add(newtime);
+                }
+                return washesOpenerHoursInTimezone;
+            }
+        }
 
         public DateTime Date;
         public bool AvailableForSSK { get { return Date.DayOfWeek == DayOfWeek.Sunday || Date.DayOfWeek == DayOfWeek.Wednesday; } }

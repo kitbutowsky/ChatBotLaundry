@@ -49,7 +49,7 @@ namespace ChatBotLaundry
                 {
                     Date = DateTime.UtcNow,
                     HoursWashesTable = new long[Data.WashesHours.Count, Data.WashesAmount],
-                    HoursWashesOpenerTable = new long[Data.WashesOpenerHours.Count],
+                    HoursWashesOpenerTable = new long[Data.WashesOpenerHoursInTimezone.Count],
                     WashesHours = Data.WashesHours
                 };
                 Data.Days.Add(newDay);
