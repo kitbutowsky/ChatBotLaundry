@@ -132,18 +132,22 @@ namespace ChatBotLaundry
                             }
                             if (int.TryParse(msg, out int num) && num <= user.adminIdsList.Item1.Count)
                             {
+                                var us = Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; });
                                 if (user.adminIdsList.Item2 == "bl")
                                 {
-                                    var us = Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; }).Blocked;
-                                    us.Item1 = false;
-                                    us.Item2 = new DateTime(0,0,0); 
-                                    us.Item3--;
-                }
+                                    us.Blocked.Item1 = false;
+                                    us.Blocked.Item2 = DateTime.UtcNow; 
+                                    us.Blocked.Item3--;
+                                    WebInterface.SendMessage(us.ID, "Блокировка снята");
+                                    BotAsynh.BotRun(us, "", ""); 
+                                }
                                 else
-                                    Data.Users.Find(delegate (User usr)
-                                    {
-                                        return usr.ID == user.adminIdsList.Item1[num];
-                                    }).Status = 0;
+                                {
+                                    us.Status = 0;
+                                    us.Condition = "cl";
+                                    WebInterface.SendMessage(us.ID, "Теперь вы клиент");
+                                    WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
+                                }
                                 user.adminIdsList.Item1.RemoveAt(num);
                                 user.Condition = "usrs";
                             }
@@ -164,9 +168,9 @@ namespace ChatBotLaundry
                         case "pas":
                             user.Condition = button;
                             return;
-                        //case "w":
-                        //    user.Condition = button;
-                        //    return;
+                        case "w":
+                            user.Condition = button;
+                            return;
                         case "b":
                             user.Condition = "ad";
                             return;
@@ -219,6 +223,17 @@ namespace ChatBotLaundry
                             Data.WashesHours.Sort();
                         }
                     }
+                    
+        
+                    public static void W(User user, string button)
+                    {
+                        user.Condition = "l";
+                        if (button == "b")
+                            return;
+                        Data.WashesAmount = int.Parse(button);
+                        WebInterface.SendMessage(user.ID, "Теперь машинок " + button);
+                    }
+
                     //todo
                     public static void Pas(User user, string button, string msg)
                     {

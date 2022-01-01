@@ -70,6 +70,9 @@ namespace ChatBotLaundry
                 case "time":
                     Modules.Time(user, button);
                     break;
+                case "w":
+                    Modules.W(user, button);
+                    break;
                 case "n":
                     Modules.N(user, button, msg);
                     break;
@@ -89,14 +92,14 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите класс пользователя:", GetButtons.Us());
                     return;
                 case "usrs":
-                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, "пользователей"), GetButtons.Usrs(user.adminIdsList.Item2));
+                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, " пользователей"), GetButtons.Usrs(user.adminIdsList.Item2));
                     return;
                 case "add":
-                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, "пользователей"));
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, " пользователей"));
                     WebInterface.SendButtons(user.ID, "Введите id пользователя", GetButtons.Back());
                     return;
                 case "del":
-                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, "пользователей"));
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, " пользователей"));
                     WebInterface.SendButtons(user.ID, "Введите номер пользователя", GetButtons.Back());
                     return;
                 case "l":
@@ -117,6 +120,9 @@ namespace ChatBotLaundry
                     return;
                 case "time":
                     WebInterface.SendButtons(user.ID, Data.WashesHoursToString(), GetButtons.Time());
+                    return;
+                case "w":
+                    WebInterface.SendButtons(user.ID, "Выберите количество машинок:", GetButtons.W());
                     return;
                 case "n":
                     WebInterface.SendMessage(user.ID, Data.AllNotesToStringList());

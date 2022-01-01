@@ -122,6 +122,17 @@ namespace ChatBotLaundry
                         return buttons;
                     }
 
+                    internal static List<List<(string, string)>> W()
+                    {
+                        var buttons = new List<List<(string, string)>> { new List<(string, string)>() };
+                        for (var t = 1; t < 5; t++)
+                        {
+                            buttons[0].Add((t.ToString(), t.ToString()));
+                        }
+                        buttons.Add(new List<(string, string)> { ("Назад", "b") });
+                        return buttons;
+                    }
+
         internal static List<List<(string, string)>> Cl(User user)
         {
             var buttons = new List<List<(string, string)>> {
