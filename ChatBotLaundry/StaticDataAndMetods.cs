@@ -13,5 +13,11 @@ namespace ChatBotLaundry
         { 
             return dayOfWeekRussian[(int)date.AddHours(Timezone).DayOfWeek];  
         }
+
+        readonly public static List<string> Statuses = new List<string> {
+            "Клиент",
+            "ССК",
+            "Открывающий",
+            "Администратор"};
     }
 }

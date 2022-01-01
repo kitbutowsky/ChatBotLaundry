@@ -143,13 +143,6 @@ namespace ChatBotLaundry
             return list;
         }
 
-        readonly public static List<string> Statuses = new List<string> {
-            "Клиенты",
-            "ССК",
-            "Открывающие",
-            "Админы",
-            "Черный список" };
-
         /// <summary>
         /// список пользователей 
         /// </summary>

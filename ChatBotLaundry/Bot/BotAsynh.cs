@@ -130,6 +130,12 @@ namespace ChatBotLaundry
 
         public static void BotOpener(User user, string button, string msg)
         {
+            //todo
+            if (user.Status == 2 && user.Condition == "cl" && msg == "reset")
+            {
+                user.Condition = "op";
+                WebInterface.SendMessage(user.ID, "Теперь вам доступны функции отрывающего!");
+            }
             //Выполнение действий по нажатию кнопки
             switch (user.Condition)
             {

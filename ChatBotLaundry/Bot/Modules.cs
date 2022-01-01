@@ -97,8 +97,26 @@ namespace ChatBotLaundry
                             if (long.TryParse(msg, out long usId))
                             {
                                 user.Condition = "usrs";
+                                var us = Data.Users.Find(delegate (User usr) { return usr.ID == usId; });
                                 if (user.adminIdsList.Item2 != "bl")
-                                    Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
+                                {
+                                    if (us != null)
+                                    {
+                                        us.Status = int.Parse(user.adminIdsList.Item2);
+                                        WebInterface.SendMessage(usId, "Теперь вы " + StaticDataAndMetods.Statuses[us.Status]);
+                                        switch (us.Status)
+                                        {
+                                            case 2:
+                                                WebInterface.SendButtons(user.ID, "Функции открывающего:", GetButtons.Op(user));
+                                                break;
+                                            case 3:
+                                                WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Adm());
+                                                break;
+                                        }
+                                    }
+                                    else
+                                        Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
+                                }
                                 user.adminIdsList.Item1.Add(usId);
                             }
                             else
