@@ -356,42 +356,55 @@ namespace ChatBotLaundry
         //функции открывающего
         public static void Op(User user, string button)
         {
+            if (button == "b") 
+            { 
+                user.Condition = "ad";
+                return; 
+            }
             if (button != "st" && button != "")
                 user.Condition = button;
         }
 
             public static void Opd(User user, string button)
             {
+                user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
                 switch (button)
                 {
                     case "allcm":
-                        //пришли все создание отметки и времени открытия
-                        user.Condition = "op";
+                        MakeOpenerNote(user);
                         break;
                     case "ddn":
-                        user.Condition = button;
-                        user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
-                        break;
+                        user.Condition = "ddn";
+                        return;
                     case "b":
-                        user.Condition = "op";
                         user.OpenerIdsList.Clear();
                         break;
                 };
+                user.Condition = "op";
             }
+                
                 //todo
                 public static void Ddn(User user, string button)
                 {
-                    switch (button)
+                    if (button == "y")
                     {
-                        case "op":
-                            user.Condition = button;
-                            break;
-                        case "ddn":
-                            user.Condition = button;
-                            user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
-                            break;
-                    };
+                        MakeOpenerNote(user);
+                        user.Condition = "op";
+                    }
+                    var id = int.Parse(button);
+                    var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; }).Blocked;
+                    blU.Item1 = true;
+                    blU.Item2 = DateTime.UtcNow.AddDays(7);
+                    blU.Item3++;
+                    user.OpenerIdsList.Remove(id);
                 }
+            
+                                    public static void MakeOpenerNote(User user)
+                                    {
+                                        foreach (var id in user.OpenerIdsList)
+                                            Data.Users.Find(delegate (User usr) { return usr.ID == id; }).WashCounter++;
+                                        user.OpenerTimes.Add(new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second));
+                                    }
             //todo
             public static void Opt(User user, string button)
             {

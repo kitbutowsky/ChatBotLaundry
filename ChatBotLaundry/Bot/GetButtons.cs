@@ -267,7 +267,15 @@ namespace ChatBotLaundry
                 internal static List<List<(string, string)>> Ddn(User user)
                 {
                     //кнопки с номерами и кнопка подтверждения
-                    var buttons = new List<List<(string, string)>> { new List<(string, string)> { ("Да", "op"), ("Открыл", "ddn") } };
+                    var ids = user.OpenerIdsList;
+                    var buttons = new List<List<(string, string)>> {
+                        new List<(string, string)> { },
+                        new List<(string, string)> { ("Подтвердить", "y") }};
+                    for (var i = 0; i < ids.Count; i++)
+                    {
+                        var button = (i.ToString(), ids[i].ToString());
+                        buttons[0].Add(button);
+                    }
                     return buttons;
                 }
 
