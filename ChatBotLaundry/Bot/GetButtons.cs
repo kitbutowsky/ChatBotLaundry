@@ -179,11 +179,16 @@ namespace ChatBotLaundry
             internal static List<List<(string, string)>> Cln(int status)
             {
                 var buttons = new List<List<(string, string)>>();
+                var i = 0;
                 for (var d = 0; d < Data.Days.Count; d++)
                     if (Data.Days[d].IsEmpty && (Data.Days[d].AvailableForSSK == (status != 0)))
                     {
-                        var button = new List<(string, string)> { (StaticDataAndMetods.DayOfWeekR(Data.Days[d].Date) + " " + Data.Days[d].EmptySpaces.ToString(), d.ToString()) };
-                        buttons.Add(button);
+                        var button = (StaticDataAndMetods.DayOfWeekR(Data.Days[d].Date) + " " + Data.Days[d].EmptySpaces.ToString(), d.ToString())
+                        if (i % 2 == 0)
+                            buttons.Add(new List<(string, string)> { button });
+                        else
+                            buttons[i / 2].Add(button);
+                        i++;
                     }
                 buttons.Add(new List<(string, string)> { ("Назад", "b") });
                 return buttons;
@@ -192,12 +197,16 @@ namespace ChatBotLaundry
                 internal static List<List<(string, string)>> Clnd(int day)
                 {
                     var buttons = new List<List<(string, string)>>();
+                    var c = 0;
                     for (var i = 0; i < Data.Days[day].HoursWashesTable.GetLength(0); i++)
                     {
                         if (Data.Days[day].EmptyTimes[i] != 0)
                         {
-                            var button = new List<(string, string)> { ((Data.WashesHours[i] + StaticDataAndMetods.Timezone).ToString() + ":00 кол-во свободных машинок:" + Data.Days[day].EmptyTimes[i].ToString(), i.ToString()) };
-                            buttons.Add(button);
+                            var button = ((Data.WashesHours[i] + StaticDataAndMetods.Timezone).ToString() + ":00 " + Data.Days[day].EmptyTimes[i].ToString(), i.ToString()) ;
+                            if (c % 2 == 0)
+                                buttons.Add(new List<(string, string)> { button });
+                            else
+                                buttons[i / 2].Add(button);
                         }
                     }
                     buttons.Add(new List<(string, string)> { ("Назад", "b") });
@@ -240,7 +249,10 @@ namespace ChatBotLaundry
             var now = DateTime.UtcNow.Hour;
             if (today != null)
                 if (today.WashesOpenerHours.Contains(now))
-                    buttons.Add(new List<(string, string)> { ("Открыл", "opd") });
+                    user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
+            if (user.OpenerIdsList.Count != 0)
+                buttons.Add(new List<(string, string)> { ("Открыл", "opd") });
+               
             if (Data.Days.FindIndex(delegate (Day day)
             {
                 return day.IsEmptyOpener;
@@ -279,21 +291,37 @@ namespace ChatBotLaundry
                     return buttons;
                 }
 
-            internal static List<List<(string, string)>> Opt(User user)
+
+        internal static List<List<(string, string)>> Opt()
+        {
+            var buttons = new List<List<(string, string)>>();
+            var i = 0;
+            for (var d = 0; d < Data.Days.Count; d++)
+                if (Data.Days[d].IsEmptyOpener)
+                {
+                    var button = (StaticDataAndMetods.DayOfWeekR(Data.Days[d].Date), d.ToString());
+                    if (i % 2 == 0)
+                        buttons.Add(new List<(string, string)> { button });
+                    else
+                        buttons[i / 2].Add(button);
+                }
+            buttons.Add(new List<(string, string)> { ("Назад", "b") });
+            return buttons;
+        }
+
+            internal static List<List<(string, string)>> Optd(int day)
             {
-                var buttons = new List<List<(string, string)>> { new List<(string, string)> { ("Да", "op"), ("Открыл", "ddn") } };
+                var buttons = new List<List<(string, string)>>();
+                for (var i = 0; i < Data.Days[day].HoursWashesTable.GetLength(0); i++)
+                {
+                    if (Data.Days[day].EmptyTimes[i] != 0)
+                    {
+                        var button = new List<(string, string)> { ((Data.WashesHours[i] + StaticDataAndMetods.Timezone).ToString() + ":00 кол-во свободных машинок:" + Data.Days[day].EmptyTimes[i].ToString(), i.ToString()) };
+                        buttons.Add(button);
+                    }
+                }
+                buttons.Add(new List<(string, string)> { ("Назад", "b") });
                 return buttons;
             }
-
-                internal static List<List<(string, string)>> Optd(User user)
-                {
-                    var buttons = new List<List<(string, string)>> { new List<(string, string)> { ("Да", "op"), ("Открыл", "ddn") } };
-                    return buttons;
-                }
-
-        internal static List<List<(string, string)>> Back()
-        {
-            return new List<List<(string, string)>> { new List<(string, string)>{ ("Назад", "b") } };
-        }
     }
 }

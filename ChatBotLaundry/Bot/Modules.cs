@@ -367,7 +367,6 @@ namespace ChatBotLaundry
 
             public static void Opd(User user, string button)
             {
-                user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
                 switch (button)
                 {
                     case "allcm":
