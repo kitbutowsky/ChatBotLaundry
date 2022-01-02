@@ -213,17 +213,17 @@ namespace ChatBotLaundry
                     return buttons;
                 }
 
-        internal static List<List<(string, string)>> Clndt(int day, int time)
-        {
-            var buttons = new List<List<(string, string)>>();
-            for (var i = 1; i < Data.Days[day].EmptyTimes[time] + 1; i++)
-            {
-                var button = new List<(string, string)> { (i.ToString() + ". ", i.ToString()) };
-                buttons.Add(button);
-            }
-            buttons.Add(new List<(string, string)> { ("Назад", "b") });
-            return buttons;
-        }
+                    internal static List<List<(string, string)>> Clndt(int day, int time)
+                    {
+                        var buttons = new List<List<(string, string)>>();
+                        for (var i = 1; i < Data.Days[day].EmptyTimes[time] + 1; i++)
+                        {
+                            var button = new List<(string, string)> { (i.ToString() + ". ", i.ToString()) };
+                            buttons.Add(button);
+                        }
+                        buttons.Add(new List<(string, string)> { ("Назад", "b") });
+                        return buttons;
+                    }
 
             internal static List<List<(string, string)>> Cldn(User user)
             {
