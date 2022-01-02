@@ -44,6 +44,7 @@ namespace ChatBotLaundry
                         return;
                     case "n":
                         user.Condition = button;
+                        user.notes = BotAsynh.GetNotes(user.ID, true);
                         return;
                     case "b":
                         user.Condition = "adm";
@@ -234,7 +235,6 @@ namespace ChatBotLaundry
                         WebInterface.SendMessage(user.ID, "Теперь машинок " + button);
                     }
 
-                    //todo
                     public static void Pas(User user, string button, string msg)
                     {
                         if (button == "b")
@@ -245,6 +245,8 @@ namespace ChatBotLaundry
                         {
                             user.PasswordTries--;
                             WebInterface.SendMessage(user.ID, "Вы ввели не правильный пароль\nОсталось " + user.PasswordTries.ToString() + " попыток");
+                            if (user.PasswordTries == 0)
+                                user.Condition = "l";
                         }
                     }
 
@@ -265,10 +267,11 @@ namespace ChatBotLaundry
                         if (int.TryParse(msg, out int selectedNote))
                         {
                             var notes = BotAsynh.GetNotes(user.ID, true);
-                            BotAsynh.RemoveNote(user.ID, selectedNote, notes);
+                            BotAsynh.RemoveNote(selectedNote, notes);
                         }
                         else
                             WebInterface.SendMessage(user.ID, "Ошибка ввода!");
+                            Thread.Sleep(1000);
                     }
                     else
                         user.Condition = "ad";
@@ -284,6 +287,7 @@ namespace ChatBotLaundry
                         break;
                     case "cldn":
                         user.Condition = button;
+                        user.notes = BotAsynh.GetNotes(user.ID);
                         break;
                     case "clnt":
                         user.NotificationStatus = !user.NotificationStatus;
@@ -325,7 +329,10 @@ namespace ChatBotLaundry
                     public static void Clnd(User user, string button)
                     {
                         if (button != "b")
+                        {
                             user.Condition = "clndt";
+                            user.note[1] = int.Parse(button);
+                        }
                         else
                             user.Condition = "cln";
                     }
@@ -336,19 +343,37 @@ namespace ChatBotLaundry
                             {
                                 user.Condition = "cl";
                                 user.note[2] = int.Parse(button);
-                                BotAsynh.MakeNote(user, user.note[0], user.note[1], user.note[2]);
+                                MakeNote(user, user.note[0], user.note[1], user.note[2]);
                             }
                             else
                                 user.Condition = "clnd";
                         }
+
+                                    internal static void MakeNote(User user, int selectedDay, int selectedTime, int selectedAmount)
+                                    {
+
+                                        var note = new TimeNote(
+                                                                user.ID,
+                                                                selectedDay,
+                                                                selectedTime,
+                                                                selectedAmount
+                                                                );
+                                        //добавляет запись в список записей
+                                        Data.Days[selectedDay].Notes.Add(note);
+                                        //ищет первую свободную ячейку
+                                        var i = 0;
+                                        while (Data.Days[note.dayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
+                                        //записывает ID note.Amount раз
+                                        for (var j = i; j < note.Amount + i; j++)
+                                            Data.Days[note.dayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
+                                    }
 
                 public static void Cldn(User user, string button)
                 {
                     if (button != "b")
                     {
                         var selectedNote = int.Parse(button);
-                        var notes = BotAsynh.GetNotes(user.ID);
-                        BotAsynh.RemoveNote(user.ID, selectedNote, notes);
+                        BotAsynh.RemoveNote(selectedNote, user.notes);
                     }
                     user.Condition = "cl";
                 }
@@ -356,12 +381,19 @@ namespace ChatBotLaundry
         //функции открывающего
         public static void Op(User user, string button)
         {
-            if (button == "b") 
-            { 
-                user.Condition = "ad";
-                return; 
+            if (button == "b")
+            {
+                switch (user.Status)
+                {
+                    case 3:
+                        user.Condition = "adm";
+                        break;
+                    case 2:
+                        user.Condition = "op";
+                        break;
+                }
             }
-            if (button != "st" && button != "")
+            else if (button != "st" && button != "")
                 user.Condition = button;
         }
 
@@ -382,7 +414,6 @@ namespace ChatBotLaundry
                 user.Condition = "op";
             }
                 
-                //todo
                 public static void Ddn(User user, string button)
                 {
                     if (button == "y")
@@ -402,40 +433,30 @@ namespace ChatBotLaundry
                                     {
                                         foreach (var id in user.OpenerIdsList)
                                             Data.Users.Find(delegate (User usr) { return usr.ID == id; }).WashCounter++;
-                                        user.OpenerTimes.Add(new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second));
+                                        user.OpenerTime.Add(new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second));
                                     }
-            //todo
+            
             public static void Opt(User user, string button)
             {
-                switch (button)
+                if (button != "b")
                 {
-                    case "allcm":
-                        //пришли все создание отметки и времени открытия
-                        user.Condition = "op";
-                        break;
-                    case "ddn":
-                        user.Condition = button;
-                        user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
-                        break;
-                    case "b":
-                        user.Condition = "op";
-                        user.OpenerIdsList.Clear();
-                        break;
-                };
+                    user.Condition = "optd";
+                    user.opnote[0] = int.Parse(button);
+                }
+                else
+                    user.Condition = "op";
             }
-                //todo
+                
                 public static void Optd(User user, string button)
                 {
-                    switch (button)
+                    if (button != "b")
                     {
-                        case "op":
-                            user.Condition = button;
-                            break;
-                        case "ddn":
-                            user.Condition = button;
-                            user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
-                            break;
-                    };
+                        user.Condition = "op";
+                        user.opnote[1] = int.Parse(button);
+                        Data.Days[user.note[0]].HoursWashesOpenerTable[user.opnote[1]] = user.ID;
+                    }
+                    else
+                        user.Condition = "opt";
                 }
     }
 }

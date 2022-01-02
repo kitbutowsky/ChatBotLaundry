@@ -92,14 +92,14 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите класс пользователя:", GetButtons.Us());
                     return;
                 case "usrs":
-                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, " пользователей"), GetButtons.Usrs(user.adminIdsList.Item2));
+                    WebInterface.SendButtons(user.ID, ListToNumerableStringIdsList(user.adminIdsList.Item1, " пользователей"), GetButtons.Usrs(user.adminIdsList.Item2));
                     return;
                 case "add":
-                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, " пользователей"));
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringIdsList(user.adminIdsList.Item1, " пользователей"));
                     WebInterface.SendButtons(user.ID, "Введите id пользователя", GetButtons.Back());
                     return;
                 case "del":
-                    WebInterface.SendMessage(user.ID, ListToNumerableStringList(user.adminIdsList.Item1, " пользователей"));
+                    WebInterface.SendMessage(user.ID, ListToNumerableStringIdsList(user.adminIdsList.Item1, " пользователей"));
                     WebInterface.SendButtons(user.ID, "Введите номер пользователя", GetButtons.Back());
                     return;
                 case "l":
@@ -125,7 +125,7 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите количество машинок:", GetButtons.W());
                     return;
                 case "n":
-                    WebInterface.SendMessage(user.ID, Data.AllNotesToStringList());
+                    WebInterface.SendMessage(user.ID, ListToNumerableNotesStringList(user.notes, " всех записей"));
                     WebInterface.SendButtons(user.ID, "Введите номер записи для отмены:", GetButtons.Back());
                     return;
             }
@@ -231,13 +231,13 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Все ли пришли?", GetButtons.Opd(user));
                     return;
                 case "ddn":
-                    WebInterface.SendButtons(user.ID, ListToNumerableStringList(user.OpenerIdsList, " пришедших") + "\n Выберите непришедших", GetButtons.Ddn(user));
+                    WebInterface.SendButtons(user.ID, ListToNumerableStringIdsList(user.OpenerIdsList, " пришедших") + "\n Выберите непришедших", GetButtons.Ddn(user));
                     return;
                 case "opt":
-                    WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", GetButtons.Opt(user));
+                    WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", GetButtons.Opt());
                     return;
                 case "optd":
-                    WebInterface.SendButtons(user.ID, "Выберите удобное время открытия", GetButtons.Optd(user));
+                    WebInterface.SendButtons(user.ID, "Выберите удобное время открытия", GetButtons.Optd(user.opnote[0]));
                     return;
             }
         }
@@ -259,32 +259,13 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите количество машинок:", GetButtons.Clndt(user.note[0], user.note[1]));
                     return;
                 case "cldn":
-                    WebInterface.SendButtons(user.ID, "Отмена записи", GetButtons.Cldn(user));
+                    WebInterface.SendButtons(user.ID, ListToNumerableNotesStringList(user.notes, " записей") + "\nВыберите запись для отмены", GetButtons.Cldn(user));
                     return;
             }
         }
 
         //методы клиента
-        internal static void MakeNote(User user, int selectedDay, int selectedTime, int selectedAmount)
-        {
-
-            var note = new TimeNote(
-                                    user.ID,
-                                    selectedDay,
-                                    selectedTime,
-                                    selectedAmount
-                                    );
-            //добавляет запись в список записей
-            Data.Days[selectedDay].Notes.Add(note);
-            //ищет первую свободную ячейку
-            var i = 0;
-            while (Data.Days[note.dayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
-            //записывает ID note.Amount раз
-            for (var j = i; j < note.Amount + i; j++)
-                Data.Days[note.dayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
-        }
-
-        internal static void RemoveNote(long id, int selectedNote, List<TimeNote> notes)
+        internal static void RemoveNote( int selectedNote, List<TimeNote> notes)
         {
             var amount = notes[selectedNote].Amount;
             //ищет индекс дня в списке дней для удаления записи
@@ -294,7 +275,7 @@ namespace ChatBotLaundry
             });
             for (var i = 0; i < Data.WashesAmount; i++)
             {
-                if (Data.Days[index].HoursWashesTable[notes[selectedNote].Time, i] == id
+                if (Data.Days[index].HoursWashesTable[notes[selectedNote].Time, i] == notes[selectedNote].UserID
                     && amount != 0)
                 {
                     Data.Days[index].HoursWashesTable[notes[selectedNote].Time, i] = 0;
@@ -335,15 +316,29 @@ namespace ChatBotLaundry
             return listIds;
         }
 
-        internal static string ListToNumerableStringList(List<long> list, string ob)
+        internal static string ListToNumerableStringIdsList(List<long> list, string ob)
         {
             string stringListIds = "Список" + ob + "\n";
             var i = 0;
-            foreach (var id in list)
+            foreach (var item in list)
             {
-                stringListIds += i.ToString() + " https://vk.com/im?sel=" + id.ToString() + "\n";
+                stringListIds += i.ToString() + ". https://vk.com/im?sel=" + item.ToString() + "\n";
                 i++;
             }
+            return stringListIds;
+        }
+
+        internal static string ListToNumerableNotesStringList(List<TimeNote> list, string ob)
+        {
+            string stringListIds = "Список" + ob + "\n";
+            var i = 0;
+            foreach (var item in list)
+            {
+                stringListIds += i.ToString() + ". " + item.ToString() + "\n";
+                i++;
+            }
+            if (list.Count == 0)
+                stringListIds = "Нет записей";
             return stringListIds;
         }
         /// <summary>

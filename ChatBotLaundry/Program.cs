@@ -25,6 +25,7 @@ namespace ChatBotLaundry
                     {
                         return usr.ID == id;
                     });
+                //todo
                 if (user.Blocked.Item1)
                 {
                     WebInterface.SendMessage(user.ID, "Вы временно заблокированны");

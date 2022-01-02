@@ -13,7 +13,6 @@ namespace ChatBotLaundry
         private int status;
         public bool NotificationStatus = true;
         public int WashCounter = 0;
-        private string condition = "st";
         /// <summary>
         /// статус блокировки, время блокировки и количество нарушений
         /// </summary>
@@ -22,9 +21,11 @@ namespace ChatBotLaundry
         /// 1 - сск, 2 - открывающий, 3 - админ, по умолчанию 0 - клиент
         /// </summary>
         public int Status{ get { return status; } set { status = value; } }
-        public string Condition { get { return condition; } set { condition = value; } }
 
         //служебные поля
+        private string condition = "st";
+        public string Condition { get { return condition; } set { condition = value; } }
+        public List<TimeNote> notes;
 
         //поля для клиента
         public int[] note = new [] {0, 0, 0};
@@ -35,17 +36,19 @@ namespace ChatBotLaundry
         /// список записанных на определенное время пользователей
         /// </summary>
         public List<long> OpenerIdsList;
+        
+        public int OpenedTimes;
         /// <summary>
         /// список времени открытия
         /// </summary>
-        public List<TimeSpan> OpenerTimes;
-        public TimeSpan AverageOpenerTimes { 
+        public List<TimeSpan> OpenerTime;
+        public TimeSpan AverageOpenerTime { 
             get 
             {
                 var av = TimeSpan.Zero;
-                foreach (var t in OpenerTimes)
+                foreach (var t in OpenerTime)
                     av += t;
-                av /= OpenerTimes.Count;
+                av /= OpenerTime.Count;
                 return av;
             }
         }

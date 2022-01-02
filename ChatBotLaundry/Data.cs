@@ -87,19 +87,19 @@ namespace ChatBotLaundry
         public static List<Day> Days = new List<Day>{
             new Day(){
                 Date = new DateTime(2021, 11, 15),
-                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
+                HoursWashesTable = new long[,]{ {0, 0, 0}, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } },
                 WashesHours = new List<int> { 5, 8, 11, 14 },
                 HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 16),
-                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
+                HoursWashesTable = new long[,]{ { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } },
                 WashesHours = new List<int> { 5, 8, 11, 14 },
                 HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
             },
             new Day(){
                 Date = new DateTime(2021, 11, 17),
-                HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
+                HoursWashesTable = new long[,]{ { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }},
                 WashesHours = new List<int> { 5, 8, 11, 14 },
                 HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
             },
@@ -128,20 +128,6 @@ namespace ChatBotLaundry
                 HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
             }
         };
-
-
-        public static string AllNotesToStringList()
-        {
-            var list = "";
-            foreach (var day in Days)
-                for (var i = 0; i < day.Notes.Count; i++)
-                {
-                    list += i.ToString() + ' ' + day.Notes[i].ToString() + "\n";
-                }
-            if (list == "")
-                list = "Нет записей";
-            return list;
-        }
 
         /// <summary>
         /// список пользователей 
