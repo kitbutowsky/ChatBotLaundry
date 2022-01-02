@@ -133,13 +133,22 @@ namespace ChatBotLaundry
 
         internal static List<List<(string, string)>> Cl(User user)
         {
-            var buttons = new List<List<(string, string)>> {
-                new List<(string, string)>{
-                    ("Выкл уведомления", "clnt"),
-                    ("FAQ", "info")
-                }
-            };
-
+            var buttons = new List<List<(string, string)>>();
+            if (Data.Days.FindIndex(delegate (Day day)
+            {
+                foreach (var note in day.Notes)
+                    if (note.UserID == user.ID && note.Day.Date == DateTime.UtcNow.Date && day.WashesOpenerHours.Contains(DateTime.UtcNow.Hour))
+                        return true;
+                return false;
+            }
+            ) != -1)
+                buttons.Add(new List<(string, string)> { ("Не открыли", "ddop") });
+            if (Data.Days.FindIndex(delegate (Day day)
+            {
+                return (day.IsEmpty) && (day.AvailableForSSK == !(user.Status == 0));
+            }
+            ) != -1)
+                buttons.Add(new List<(string, string)> { ("Записаться в прачечную", "cln") });
             if (Data.Days.FindIndex(delegate (Day day)
             {
                 foreach (var note in day.Notes)
@@ -148,29 +157,14 @@ namespace ChatBotLaundry
                 return false;
             }
             ) != -1)
-                buttons.Insert(0, new List<(string, string)> { ("Отмена", "cldn") });
-            if (Data.Days.FindIndex(delegate (Day day)
-            {
-                return (day.IsEmpty) && (day.AvailableForSSK == !(user.Status == 0));
-            }
-            ) != -1)
-                buttons.Insert(0, new List<(string, string)> { ("Записаться в прачечную", "cln") });
+                buttons.Add(new List<(string, string)> { ("Отмена", "cldn") });
             if (!user.NotificationStatus)
-            {
-                var repl = buttons[^1][0];
-                repl.Item1 = "Вкл уведомления";
-                buttons[^1][0] = repl;
-            }
+                buttons.Add(new List<(string, string)> { ("Вкл уведомления", "clnt") });
             else
-            {
-                var repl = buttons[^1][0];
-                repl.Item1 = "Выкл уведомления";
-                buttons[^1][0] = repl;
-            }
+                buttons.Add(new List<(string, string)> { ("Выкл уведомления", "clnt") });
+            buttons.Add(new List<(string, string)> { ("FAQ", "info") });
             if (user.Status == 3 || user.Status == 2)
-            {
                 buttons.Add(new List<(string, string)> { ("Назад", "b") });
-            }
             return buttons;
         }
 

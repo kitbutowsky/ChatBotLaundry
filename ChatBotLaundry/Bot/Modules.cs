@@ -282,6 +282,19 @@ namespace ChatBotLaundry
             {
                 switch (button)
                 {
+                    case "ddop":
+                        WebInterface.SendMessage(user.ID, 
+                            "В ближайшее время с вами свяжется администратор\n" +
+                            "Если вам не откроют в течении 10 минут просто уходите в комнату\n" +
+                            "Хорошего вам дня!"); 
+                        Predicate<User> condition;
+                        condition = delegate (User us) { return us.Status == 3; };
+                        foreach (var admin in BotAsynh.GetUsersIdsList(condition))
+                            WebInterface.SendMessage(admin,
+                            "Пользователю https://vk.com/im?sel=" + user.ID.ToString() + 
+                            " не открыли прачку\n" +
+                            "Он ждет!"); 
+                        break;
                     case "cln":
                         user.Condition = button;
                         break;

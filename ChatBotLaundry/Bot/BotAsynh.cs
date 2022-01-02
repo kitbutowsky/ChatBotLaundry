@@ -103,7 +103,7 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Введите номер пользователя", GetButtons.Back());
                     return;
                 case "l":
-                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.L());
+                    WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.L(user));
                     return;
                 case "pas":
                     WebInterface.SendButtons(user.ID, "Введите пароль:", GetButtons.Back());
