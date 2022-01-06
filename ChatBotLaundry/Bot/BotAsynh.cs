@@ -265,24 +265,25 @@ namespace ChatBotLaundry
         }
 
         //методы клиента
-        internal static void RemoveNote( int selectedNote, List<TimeNote> notes)
+        internal static void RemoveNote( int selectedNote, User user)
         {
-            var amount = notes[selectedNote].Amount;
+            var amount = user.notes[selectedNote].Amount;
             //ищет индекс дня в списке дней для удаления записи
             var index = Data.Days.FindIndex(delegate (Day day)
             {
-                return day.Date == notes[selectedNote].Day.Date;
+                return day.Date == user.notes[selectedNote].Day.Date;
             });
             for (var i = 0; i < Data.WashesAmount; i++)
             {
-                if (Data.Days[index].HoursWashesTable[notes[selectedNote].Time, i] == notes[selectedNote].UserID
+                if (Data.Days[index].HoursWashesTable[user.notes[selectedNote].Time, i] == user.notes[selectedNote].UserID
                     && amount != 0)
                 {
-                    Data.Days[index].HoursWashesTable[notes[selectedNote].Time, i] = 0;
+                    Data.Days[index].HoursWashesTable[user.notes[selectedNote].Time, i] = 0;
                     amount -= 1;
                 }
             }
-            Data.Days[index].Notes.Remove(notes[selectedNote]);
+            Data.Days[index].Notes.Remove(user.notes[selectedNote]);
+            user.notes.RemoveAt(selectedNote);
         }
 
         //методы админа
