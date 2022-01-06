@@ -20,7 +20,6 @@ namespace ChatBotLaundry
                     user.Condition = button;
                     return;
                 case "re":
-                    user.Condition = button;
                     WebInterface.SendMessage(user.ID, "Отчетность:");
                     return;
                 case "infad":
@@ -108,10 +107,12 @@ namespace ChatBotLaundry
                                         switch (us.Status)
                                         {
                                             case 2:
-                                                WebInterface.SendButtons(user.ID, "Функции открывающего:", GetButtons.Op(user));
+                                                us.Condition = "op";
+                                                WebInterface.SendButtons(us.ID, "Функции открывающего:", GetButtons.Op(us));
                                                 break;
                                             case 3:
-                                                WebInterface.SendButtons(user.ID, "Выберите действие:", GetButtons.Adm());
+                                                us.Condition = "adm";
+                                                WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Adm());
                                                 break;
                                         }
                                     }
@@ -139,6 +140,7 @@ namespace ChatBotLaundry
                                     us.Blocked.Item1 = false;
                                     us.Blocked.Item2 = DateTime.UtcNow; 
                                     us.Blocked.Item3--;
+                                    us.Condition = "cl";
                                     WebInterface.SendMessage(us.ID, "Блокировка снята");
                                     BotAsynh.BotRun(us, "", ""); 
                                 }
@@ -267,7 +269,7 @@ namespace ChatBotLaundry
                         if (int.TryParse(msg, out int selectedNote))
                         {
                             var notes = BotAsynh.GetNotes(user.ID, true);
-                            BotAsynh.RemoveNote(selectedNote, notes);
+                            BotAsynh.RemoveNote(selectedNote, user);
                         }
                         else
                             WebInterface.SendMessage(user.ID, "Ошибка ввода!");
@@ -386,7 +388,7 @@ namespace ChatBotLaundry
                     if (button != "b")
                     {
                         var selectedNote = int.Parse(button);
-                        BotAsynh.RemoveNote(selectedNote, user.notes);
+                        BotAsynh.RemoveNote(selectedNote, user);
                     }
                     user.Condition = "cl";
                 }
@@ -435,10 +437,10 @@ namespace ChatBotLaundry
                         user.Condition = "op";
                     }
                     var id = int.Parse(button);
-                    var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; }).Blocked;
-                    blU.Item1 = true;
-                    blU.Item2 = DateTime.UtcNow.AddDays(7);
-                    blU.Item3++;
+                    var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; });
+                    blU.Blocked.Item1 = true;
+                    blU.Blocked.Item2 = DateTime.UtcNow.AddDays(7);
+                    blU.Blocked.Item3++;
                     user.OpenerIdsList.Remove(id);
                 }
             
