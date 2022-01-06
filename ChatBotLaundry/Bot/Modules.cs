@@ -148,7 +148,8 @@ namespace ChatBotLaundry
                                 {
                                     us.Status = 0;
                                     us.Condition = "cl";
-                                    WebInterface.SendMessage(us.ID, "Теперь вы клиент");
+                                    WebInterface.SendMessage(us.ID, "Теперь вы клиент" +
+                                        "");
                                     WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
                                 }
                                 user.adminIdsList.Item1.RemoveAt(num);
@@ -268,8 +269,12 @@ namespace ChatBotLaundry
                     {
                         if (int.TryParse(msg, out int selectedNote))
                         {
-                            var notes = BotAsynh.GetNotes(user.ID, true);
                             BotAsynh.RemoveNote(selectedNote, user);
+                            if (user.notes.Count == 0)
+                            {
+                                user.Condition = "ad";
+                                WebInterface.SendMessage(user.ID, "Все записи отменены");
+                            } 
                         }
                         else
                             WebInterface.SendMessage(user.ID, "Ошибка ввода!");
@@ -389,8 +394,14 @@ namespace ChatBotLaundry
                     {
                         var selectedNote = int.Parse(button);
                         BotAsynh.RemoveNote(selectedNote, user);
+                        if (user.notes.Count == 0)
+                        {
+                            user.Condition = "cl";
+                            WebInterface.SendMessage(user.ID, "Все записи отменены");
+                        }   
                     }
-                    user.Condition = "cl";
+                    else
+                        user.Condition = "cl";
                 }
 
         //функции открывающего
