@@ -29,32 +29,22 @@ namespace ChatBotLaundry
                 if (user.Blocked.Item1)
                 {
                     WebInterface.SendMessage(user.ID, "Вы временно заблокированны");
-                    WebInterface.SendMessage(user.ID, "Время до конца блокировки");
+                    var time = DateTime.UtcNow - user.Blocked.Item2;
+                    WebInterface.SendMessage(user.ID, "Время до конца блокировки: " + time.TotalHours.ToString() + " часов");
                 }
                 else
                     BotAsynh.BotRun(user, button, msg);  
             }
         }
 
+
+
         static void Main()
         {
             var thread = new Thread(() => CheckMessege());
             thread.Start();
-            while (true)
-            {
-                Thread.Sleep(100000);
-                Console.WriteLine("Запись обновилась");
-                Data.DaysArhive.Add(Data.Days[0]);
-                Data.Days.RemoveAt(0);
-                var newDay = new Day
-                {
-                    Date = DateTime.UtcNow,
-                    HoursWashesTable = new long[Data.WashesHours.Count, Data.WashesAmount],
-                    HoursWashesOpenerTable = new long[Data.WashesOpenerHoursInTimezone.Count],
-                    WashesHours = Data.WashesHours
-                };
-                Data.Days.Add(newDay);
-            }
+            var updater = new Thread(() => DataMethods.DayUpdate());
+            updater.Start();
         }
     }
 }

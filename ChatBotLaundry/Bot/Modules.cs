@@ -267,7 +267,7 @@ namespace ChatBotLaundry
                 {
                     if (button != "b")
                     {
-                        if (int.TryParse(msg, out int selectedNote))
+                        if (int.TryParse(msg, out int selectedNote) && (selectedNote < user.notes.Count && selectedNote >= 0))
                         {
                             BotAsynh.RemoveNote(selectedNote, user);
                             if (user.notes.Count == 0)
@@ -337,10 +337,10 @@ namespace ChatBotLaundry
 
                 public static void Cln(User user, string button)
                 {
-                    if (button != "b")
+                    if (button != "b" && int.TryParse(button, out var note))
                     {
                         user.Condition = "clnd";
-                        user.note[0] = int.Parse(button);
+                        user.note[0] = note;
                     }
                     else
                         user.Condition = "cl";
@@ -348,10 +348,10 @@ namespace ChatBotLaundry
 
                     public static void Clnd(User user, string button)
                     {
-                        if (button != "b")
+                        if (button != "b" && int.TryParse(button, out var note))
                         {
                             user.Condition = "clndt";
-                            user.note[1] = int.Parse(button);
+                            user.note[1] = note;
                         }
                         else
                             user.Condition = "cln";
@@ -359,10 +359,10 @@ namespace ChatBotLaundry
 
                         public static void Clndt(User user, string button)
                         {
-                            if (button != "b")
+                            if (button != "b" && int.TryParse(button, out var note))
                             {
                                 user.Condition = "cl";
-                                user.note[2] = int.Parse(button);
+                                user.note[2] = note;
                                 MakeNote(user, user.note[0], user.note[1], user.note[2]);
                             }
                             else
