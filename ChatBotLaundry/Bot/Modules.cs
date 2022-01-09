@@ -43,7 +43,7 @@ namespace ChatBotLaundry
                         return;
                     case "n":
                         user.Condition = button;
-                        user.notes = BotAsynh.GetNotes(user.ID, true);
+                        user.notes = DataMethods.GetNotes(user.ID, true);
                         return;
                     case "b":
                         user.Condition = "adm";
@@ -68,7 +68,7 @@ namespace ChatBotLaundry
                             condition = delegate (User us) { return us.Status == int.Parse(button); };
                             break;
                     };
-                    user.adminIdsList = (BotAsynh.GetUsersIdsList(condition), button);
+                    user.adminIdsList = (DataMethods.GetUsersIdsList(condition), button);
                 }
 
                     public static void Usrs(User user, string button)
@@ -269,7 +269,7 @@ namespace ChatBotLaundry
                     {
                         if (int.TryParse(msg, out int selectedNote) && (selectedNote < user.notes.Count && selectedNote >= 0))
                         {
-                            BotAsynh.RemoveNote(selectedNote, user);
+                            DataMethods.RemoveNote(selectedNote, user);
                             if (user.notes.Count == 0)
                             {
                                 user.Condition = "ad";
@@ -296,7 +296,7 @@ namespace ChatBotLaundry
                             "Хорошего вам дня!"); 
                         Predicate<User> condition;
                         condition = delegate (User us) { return us.Status == 3; };
-                        foreach (var admin in BotAsynh.GetUsersIdsList(condition))
+                        foreach (var admin in DataMethods.GetUsersIdsList(condition))
                             WebInterface.SendMessage(admin,
                             "Пользователю https://vk.com/im?sel=" + user.ID.ToString() + 
                             " не открыли прачку\n" +
@@ -307,7 +307,7 @@ namespace ChatBotLaundry
                         break;
                     case "cldn":
                         user.Condition = button;
-                        user.notes = BotAsynh.GetNotes(user.ID);
+                        user.notes = DataMethods.GetNotes(user.ID);
                         break;
                     case "clnt":
                         user.NotificationStatus = !user.NotificationStatus;
@@ -337,7 +337,7 @@ namespace ChatBotLaundry
 
                 public static void Cln(User user, string button)
                 {
-                    if (button != "b" && int.TryParse(button, out var note))
+                    if (button != "b" && int.TryParse(button, out var note) && (note >= 0 & note < 7 ))
                     {
                         user.Condition = "clnd";
                         user.note[0] = note;
@@ -369,23 +369,33 @@ namespace ChatBotLaundry
                                 user.Condition = "clnd";
                         }
 
-                                    internal static void MakeNote(User user, int selectedDay, int selectedTime, int selectedAmount)
+                                    internal static void MakeNote(User user, int selectedDay, int selectedTime, int amount)
                                     {
-
+                                        var day = Data.Days[selectedDay];
                                         var note = new TimeNote(
                                                                 user.ID,
-                                                                selectedDay,
+                                                                day.Date, 
                                                                 selectedTime,
-                                                                selectedAmount
+                                                                day.WashesHoursInTimezone[selectedTime],
+                                                                amount
                                                                 );
-                                        //добавляет запись в список записей
-                                        Data.Days[selectedDay].Notes.Add(note);
-                                        //ищет первую свободную ячейку
-                                        var i = 0;
-                                        while (Data.Days[note.dayForNotation].HoursWashesTable[note.Time, i] != 0) i++;
-                                        //записывает ID note.Amount раз
-                                        for (var j = i; j < note.Amount + i; j++)
-                                            Data.Days[note.dayForNotation].HoursWashesTable[note.Time, j] = note.UserID;
+                                        var max = day.EmptyTimes[selectedDay];
+                                        if (amount <= max) 
+                                        {
+                                            //поочередно проверяет ячейки и в свободные записывает id amount раз
+                                            for (var j = 0; j < day.WashesAmount; j++)
+                                                if (amount != 0 && day.HoursWashesTable[selectedTime, j] == 0)
+                                                {
+                                                    day.HoursWashesTable[selectedTime, j] = note.UserID;
+                                                    amount--;
+                                                }
+                                            //добавляет запись в список записей
+                                            day.Notes.Add(note);
+                                            WebInterface.SendMessage(user.ID, "Вы записаны");
+                                        }
+                                        else 
+                                            WebInterface.SendMessage(user.ID,   "Кажется вы слишком долго выбирали, это место уже забронировали\n" +
+                                                                                "Не отчаивайтесь! Выберите другое время)");
                                     }
 
                 public static void Cldn(User user, string button)
@@ -393,7 +403,7 @@ namespace ChatBotLaundry
                     if (button != "b")
                     {
                         var selectedNote = int.Parse(button);
-                        BotAsynh.RemoveNote(selectedNote, user);
+                        DataMethods.RemoveNote(selectedNote, user);
                         if (user.notes.Count == 0)
                         {
                             user.Condition = "cl";
