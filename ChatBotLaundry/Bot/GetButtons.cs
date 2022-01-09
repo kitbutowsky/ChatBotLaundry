@@ -245,7 +245,7 @@ namespace ChatBotLaundry
             if (today != null)
                 if (today.WashesOpenerHours.Contains(now))
                 {
-                    user.OpenerIdsList = BotAsynh.GetOpenerIdsList();
+                    user.OpenerIdsList = DataMethods.GetOpenerIdsList();
                     if (user.OpenerIdsList.Count != 0)
                         buttons.Add(new List<(string, string)> { ("Открыл", "opd") });
                 }
