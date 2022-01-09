@@ -8,7 +8,7 @@ namespace ChatBotLaundry
 {
     class BotAsynh 
     {
-        public static void BotRun(User user, string button, string msg)
+        public static void Run(User user, string button, string msg)
         {
             
             switch (user.Status)

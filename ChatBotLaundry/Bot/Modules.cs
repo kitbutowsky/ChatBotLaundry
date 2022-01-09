@@ -142,7 +142,7 @@ namespace ChatBotLaundry
                                     us.Blocked.Item3--;
                                     us.Condition = "cl";
                                     WebInterface.SendMessage(us.ID, "Блокировка снята");
-                                    BotAsynh.BotRun(us, "", ""); 
+                                    BotAsynh.Run(us, "", ""); 
                                 }
                                 else
                                 {
