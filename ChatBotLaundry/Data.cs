@@ -52,23 +52,7 @@ namespace ChatBotLaundry
                 return washesOpenerHours;
             }
         }
-        public static List<int> WashesOpenerHoursInTimezone
-        {
-            get
-            {
-                var washesOpenerHoursInTimezone = new List<int>();
-                foreach (var time in WashesOpenerHours)
-                {
-                    var newtime = time + StaticDataAndMetods.Timezone;
-                    if (newtime >= 24)
-                    {
-                        newtime -= 24;
-                    }
-                    washesOpenerHoursInTimezone.Add(newtime);
-                }
-                return washesOpenerHoursInTimezone;
-            }
-        }
+
         public static string WashesHoursToString()
         {
             var washesHoursData = "";
@@ -89,43 +73,50 @@ namespace ChatBotLaundry
                 Date = new DateTime(2021, 11, 15),
                 HoursWashesTable = new long[,]{ {0, 0, 0}, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } },
                 WashesHours = new List<int> { 5, 8, 11, 14 },
-                HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
+                HoursWashesOpenerTable = new long[WashesOpenerHours.Count], 
+                WashesAmount = 3
             },
             new Day(){
                 Date = new DateTime(2021, 11, 16),
                 HoursWashesTable = new long[,]{ { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } },
                 WashesHours = new List<int> { 5, 8, 11, 14 },
-                HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
+                HoursWashesOpenerTable = new long[WashesOpenerHours.Count],
+                WashesAmount = 3
             },
             new Day(){
                 Date = new DateTime(2021, 11, 17),
                 HoursWashesTable = new long[,]{ { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }},
                 WashesHours = new List<int> { 5, 8, 11, 14 },
-                HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
+                HoursWashesOpenerTable = new long[WashesOpenerHours.Count],
+                WashesAmount = 3
             },
             new Day(){
                 Date = new DateTime(2021, 11, 18),
                 HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
                 WashesHours = new List<int> { 5, 8, 11, 14 },
-                HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
+                HoursWashesOpenerTable = new long[WashesOpenerHours.Count],
+                WashesAmount = 3
             },
             new Day(){
                 Date = new DateTime(2021, 11, 19),
                 HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
                 WashesHours = new List<int> { 5, 8, 11, 14 },
-                HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
+                HoursWashesOpenerTable = new long[WashesOpenerHours.Count],
+                WashesAmount = 3
             },
             new Day(){
                 Date = new DateTime(2021, 11, 20),
                 HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
                 WashesHours = new List<int> { 5, 8, 11, 14 },
-                HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
+                HoursWashesOpenerTable = new long[WashesOpenerHours.Count],
+                WashesAmount = 3
             },
             new Day(){
                 Date = new DateTime(2021, 12, 31),
                 HoursWashesTable = new long[,]{ {1, 1, 0}, {1, 2, 3}, { 1, 1, 1 }, { 1, 2, 2} },
                 WashesHours = new List<int> { 5, 7, 11, 14 },
-                HoursWashesOpenerTable = new long[WashesOpenerHours.Count]
+                HoursWashesOpenerTable = new long[WashesOpenerHours.Count],
+                WashesAmount = 3
             }
         };
 

@@ -9,6 +9,10 @@ namespace ChatBotLaundry
     /// </summary>
     public class Day
     {
+        /// <summary>
+        /// Количество машинок
+        /// </summary>
+        public int WashesAmount;
         //время записи для этого дня
         public List<int> WashesHours;
         public List<int> WashesHoursInTimezone
