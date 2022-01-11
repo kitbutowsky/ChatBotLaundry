@@ -94,10 +94,15 @@ namespace ChatBotLaundry
                                 user.Condition = "usrs";
                                 return;
                             }
-                            if (long.TryParse(msg, out long usId))
+                            if (msg.StartsWith("https://vk.com/im?sel=") && long.TryParse(msg[(msg.IndexOf('=') + 1)..], out long usId))
                             {
                                 user.Condition = "usrs";
                                 var us = Data.Users.Find(delegate (User usr) { return usr.ID == usId; });
+                                if (us.Status == int.Parse(user.adminIdsList.Item2)) 
+                                { 
+                                    WebInterface.SendMessage(user.ID, "Этот пользаватель уже " + StaticDataAndMetods.Statuses[us.Status]);
+                                    return;
+                                }
                                 if (user.adminIdsList.Item2 != "bl")
                                 {
                                     if (us != null)
@@ -119,14 +124,12 @@ namespace ChatBotLaundry
                                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Adm());
                                                 break;
                                         }
+                                        return;  
                                     }
                                     else
-                                    {
                                         Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
-                                    }
-                                       
                                 }
-                                user.adminIdsList.Item1.Add(usId);
+                                    user.adminIdsList.Item1.Add(usId);
                             }
                             else
                                 WebInterface.SendMessage(user.ID, "Некоректный ввод! повторите попытку");

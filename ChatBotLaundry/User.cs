@@ -65,5 +65,4 @@ namespace ChatBotLaundry
             return ID.ToString() + ' ' + Status.ToString();
         }
     }
-
 }
