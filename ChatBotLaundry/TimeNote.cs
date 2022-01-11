@@ -12,6 +12,7 @@ namespace ChatBotLaundry
         private DateTime date;
         public DateTime Day { get { return date; } }
         private int time;
+        public int Time { get { return time; } }
         private int timeIndex;
         public int TimeIndex { get { return timeIndex; } }
         private int amount;

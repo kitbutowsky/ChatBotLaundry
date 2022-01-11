@@ -106,6 +106,10 @@ namespace ChatBotLaundry
                                         WebInterface.SendMessage(usId, "Теперь вы " + StaticDataAndMetods.Statuses[us.Status]);
                                         switch (us.Status)
                                         {
+                                            case 1:
+                                                us.Condition = "cl";
+                                                WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
+                                                break;
                                             case 2:
                                                 us.Condition = "op";
                                                 WebInterface.SendButtons(us.ID, "Функции открывающего:", GetButtons.Op(us));
@@ -117,7 +121,10 @@ namespace ChatBotLaundry
                                         }
                                     }
                                     else
+                                    {
                                         Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
+                                    }
+                                       
                                 }
                                 user.adminIdsList.Item1.Add(usId);
                             }
@@ -376,10 +383,10 @@ namespace ChatBotLaundry
                                                                 user.ID,
                                                                 day.Date, 
                                                                 selectedTime,
-                                                                day.WashesHoursInTimezone[selectedTime],
+                                                                day.WashesHours[selectedTime].ToTimezone(),
                                                                 amount
                                                                 );
-                                        var max = day.EmptyTimes[selectedDay];
+                                        var max = day.EmptyTimes[selectedTime];
                                         if (amount <= max) 
                                         {
                                             //поочередно проверяет ячейки и в свободные записывает id amount раз

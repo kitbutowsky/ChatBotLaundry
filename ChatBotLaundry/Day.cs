@@ -15,23 +15,6 @@ namespace ChatBotLaundry
         public int WashesAmount;
         //время записи для этого дня
         public List<int> WashesHours;
-        public List<int> WashesHoursInTimezone
-        {
-            get
-            {
-                var washesHoursInTimezone = new List<int>();
-                foreach (var time in WashesHours)
-                {
-                    var newtime = time + StaticDataAndMetods.Timezone;
-                    if (newtime >= 24)
-                    {
-                        newtime -= 24;
-                    }
-                    washesHoursInTimezone.Add(newtime);
-                }
-                return washesHoursInTimezone;
-            }
-        }
         public List<int> WashesOpenerHours
         {
             get
@@ -46,23 +29,6 @@ namespace ChatBotLaundry
                 washesOpenerHours.Add(WashesHours[^1]);
                 washesOpenerHours.Add(WashesHours[^1] + 2);
                 return washesOpenerHours;
-            }
-        }
-        public List<int> WashesOpenerHoursInTimezone
-        {
-            get
-            {
-                var washesOpenerHoursInTimezone = new List<int>();
-                foreach (var time in WashesOpenerHours)
-                {
-                    var newtime = time + StaticDataAndMetods.Timezone;
-                    if (newtime >= 24)
-                    {
-                        newtime -= 24;
-                    }
-                    washesOpenerHoursInTimezone.Add(newtime);
-                }
-                return washesOpenerHoursInTimezone;
             }
         }
 

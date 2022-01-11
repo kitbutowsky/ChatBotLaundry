@@ -23,7 +23,7 @@ namespace ChatBotLaundry
                 };
                 Data.Days.Add(newDay);
                 foreach (var us in Data.Users)
-                    if (us.Status == 3)
+                    if (us.Status == 3 || us.Status == 2)
                         WebInterface.SendMessage(us.ID, "Обновилась запись");
             }
         }

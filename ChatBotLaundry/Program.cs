@@ -45,6 +45,8 @@ namespace ChatBotLaundry
             thread.Start();
             var updater = new Thread(() => DataMethods.DayUpdate());
             updater.Start();
+            var noticer = new Thread(() => Notifications.Run());
+            noticer.Start();
         }
     }
 }

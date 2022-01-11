@@ -119,7 +119,7 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Подтверждение", GetButtons.Infadc());
                     return;
                 case "time":
-                    WebInterface.SendButtons(user.ID, Data.WashesHoursToString(), GetButtons.Time());
+                    WebInterface.SendButtons(user.ID, WashesHoursToString(), GetButtons.Time());
                     return;
                 case "w":
                     WebInterface.SendButtons(user.ID, "Выберите количество машинок:", GetButtons.W());
@@ -288,6 +288,14 @@ namespace ChatBotLaundry
             if (list.Count == 0)
                 stringListIds = "Нет записей";
             return stringListIds;
+        }
+
+        internal static string WashesHoursToString()
+        {
+            var washesHoursData = "";
+            foreach (var time in Data.WashesHours)
+                washesHoursData += time.ToTimezone().ToString() + ":00 \n";
+            return washesHoursData;
         }
     }
 }
