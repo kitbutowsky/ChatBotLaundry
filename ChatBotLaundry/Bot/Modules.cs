@@ -124,12 +124,11 @@ namespace ChatBotLaundry
                                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Adm());
                                                 break;
                                         }
-                                        return;  
                                     }
                                     else
                                         Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
                                 }
-                                    user.adminIdsList.Item1.Add(usId);
+                                user.adminIdsList.Item1.Add(usId);
                             }
                             else
                                 WebInterface.SendMessage(user.ID, "Некоректный ввод! повторите попытку");
@@ -142,7 +141,7 @@ namespace ChatBotLaundry
                                 user.Condition = "usrs";
                                 return;
                             }
-                            if (int.TryParse(msg, out int num) && num <= user.adminIdsList.Item1.Count)
+                            if (int.TryParse(msg, out int num) && num >= 0 && num < user.adminIdsList.Item1.Count)
                             {
                                 var us = Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; });
                                 if (user.adminIdsList.Item2 == "bl")
@@ -150,18 +149,15 @@ namespace ChatBotLaundry
                                     us.Blocked.Item1 = false;
                                     us.Blocked.Item2 = DateTime.UtcNow; 
                                     us.Blocked.Item3--;
-                                    us.Condition = "cl";
                                     WebInterface.SendMessage(us.ID, "Блокировка снята");
-                                    BotAsynh.Run(us, "", ""); 
                                 }
-                                else
+                                if (us.Status != 0)
                                 {
                                     us.Status = 0;
-                                    us.Condition = "cl";
-                                    WebInterface.SendMessage(us.ID, "Теперь вы клиент" +
-                                        "");
-                                    WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
+                                    WebInterface.SendMessage(us.ID, "Теперь вы клиент");
                                 }
+                                us.Condition = "cl";
+                                WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
                                 user.adminIdsList.Item1.RemoveAt(num);
                                 user.Condition = "usrs";
                             }
