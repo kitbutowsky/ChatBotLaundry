@@ -96,7 +96,7 @@ namespace ChatBotLaundry
                     return;
                 case "add":
                     WebInterface.SendMessage(user.ID, ListToNumerableStringIdsList(user.adminIdsList.Item1, " пользователей"));
-                    WebInterface.SendButtons(user.ID, "Введите id пользователя", GetButtons.Back());
+                    WebInterface.SendButtons(user.ID, "Введите ссылку на диалог с пользователем начинающуюся с https://vk.com/im?sel=", GetButtons.Back());
                     return;
                 case "del":
                     WebInterface.SendMessage(user.ID, ListToNumerableStringIdsList(user.adminIdsList.Item1, " пользователей"));
@@ -273,21 +273,23 @@ namespace ChatBotLaundry
                 stringListIds += i.ToString() + ". https://vk.com/im?sel=" + item.ToString() + "\n";
                 i++;
             }
+            if (list.Count == 0)
+                stringListIds = "Нет записей";
             return stringListIds;
         }
 
         internal static string ListToNumerableNotesStringList(List<TimeNote> list, string ob)
         {
-            string stringListIds = "Список" + ob + "\n";
+            string stringListNotes = "Список" + ob + "\n";
             var i = 0;
             foreach (var item in list)
             {
-                stringListIds += i.ToString() + ". " + item.ToString() + "\n";
+                stringListNotes += i.ToString() + ". " + item.ToString() + "\n";
                 i++;
             }
             if (list.Count == 0)
-                stringListIds = "Нет записей";
-            return stringListIds;
+                stringListNotes = "Нет записей";
+            return stringListNotes;
         }
 
         internal static string WashesHoursToString()
