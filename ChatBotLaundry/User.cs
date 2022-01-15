@@ -36,22 +36,12 @@ namespace ChatBotLaundry
         /// список записанных на определенное время пользователей
         /// </summary>
         public List<long> OpenerIdsList;
-        
-        public int OpenedTimes;
+
         /// <summary>
-        /// список времени открытия
+        /// количество открытий и среднее время
         /// </summary>
-        public List<TimeSpan> OpenerTime;
-        public TimeSpan AverageOpenerTime { 
-            get 
-            {
-                var av = TimeSpan.Zero;
-                foreach (var t in OpenerTime)
-                    av += t;
-                av /= OpenerTime.Count;
-                return av;
-            }
-        }
+        public int OpenerTimes = 0;
+        public TimeSpan AverageOpenerTime;
 
         //поля для администратора
         public int PasswordTries = 3;
