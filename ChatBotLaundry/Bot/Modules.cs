@@ -462,6 +462,7 @@ namespace ChatBotLaundry
                     {
                         MakeOpenerNote(user);
                         user.Condition = "op";
+                        return;
                     }
                     var id = int.Parse(button);
                     var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; });
@@ -475,7 +476,8 @@ namespace ChatBotLaundry
                                     {
                                         foreach (var id in user.OpenerIdsList)
                                             Data.Users.Find(delegate (User usr) { return usr.ID == id; }).WashCounter++;
-                                        user.OpenerTime.Add(new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second));
+                                        user.OpenerTimes++;
+                                        user.AverageOpenerTime = ((user.AverageOpenerTime * (user.OpenerTimes-1)) + new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second))/ user.OpenerTimes;
                                     }
             
             public static void Opt(User user, string button)
