@@ -41,6 +41,7 @@ namespace ChatBotLaundry
 
         static void Main()
         {
+            DataMethods.GetData();
             var thread = new Thread(() => CheckMessege());
             thread.Start();
             var updater = new Thread(() => DataMethods.DayUpdate());

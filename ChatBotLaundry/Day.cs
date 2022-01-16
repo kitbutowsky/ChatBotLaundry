@@ -104,5 +104,14 @@ namespace ChatBotLaundry
         /// ID[время] 
         /// </summary>
         public long[] HoursWashesOpenerTable;
+
+        public Day(DateTime Date, int WashesAmount, List<int> WashesHours)
+        {
+            this.Date = Date;
+            this.WashesAmount = WashesAmount;
+            this.WashesHours = WashesHours;
+            this.HoursWashesTable = new long[this.WashesHours.Count, WashesAmount];
+            this.HoursWashesOpenerTable = new long[this.WashesOpenerHours.Count];
+        }
     }
 }
