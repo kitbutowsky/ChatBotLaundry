@@ -25,7 +25,8 @@ namespace ChatBotLaundry
         {
             foreach (var n in day.Notes)
             {
-                if (Data.Users.Find(delegate (User usr) { return usr.ID == n.UserID; }).NotificationStatus)
+                var check = Data.Users.Find(delegate (User usr) { return usr.ID == n.UserID; });
+                if (check != null && check.NotificationStatus)
                 {
                     var m = DateTime.UtcNow.Minute;
                     var h = DateTime.UtcNow.Hour.ToTimezone();
