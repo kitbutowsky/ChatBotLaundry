@@ -33,7 +33,7 @@ namespace ChatBotLaundry
 
         public override string ToString()
         {
-            return  "ID: https://vk.com/im?sel=" + userID.ToString() +
+            return  "ID: https://vk.com/id" + userID.ToString() +
                     " День: " + StaticDataAndMetods.DayOfWeekR(date) +
                     " Время: " + time.ToString() + ":00 " +
                     " Количество машинок: " + amount.ToString();
