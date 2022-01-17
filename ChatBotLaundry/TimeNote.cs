@@ -38,5 +38,12 @@ namespace ChatBotLaundry
                     " Время: " + time.ToString() + ":00 " +
                     " Количество машинок: " + amount.ToString();
         }
+
+        public string ToStringCl()
+        {
+            return  " День: " + StaticDataAndMetods.DayOfWeekR(date) +
+                    " Время: " + time.ToString() + ":00 " +
+                    " Количество машинок: " + amount.ToString();
+        }
     }
 }

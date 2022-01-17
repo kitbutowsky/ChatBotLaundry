@@ -125,7 +125,7 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите количество машинок:", GetButtons.W());
                     return;
                 case "n":
-                    WebInterface.SendMessage(user.ID, ListToNumerableNotesStringList(user.notes, " всех записей"));
+                    WebInterface.SendMessage(user.ID, ListToNumerableNotesStringList(user.Condition, user.notes, " всех записей"));
                     WebInterface.SendButtons(user.ID, "Введите номер записи для отмены:", GetButtons.Back());
                     return;
             }
@@ -137,7 +137,7 @@ namespace ChatBotLaundry
         public static void BotOpener(User user, string button, string msg)
         {
             //todo
-            if (user.Status == 2 && user.Condition == "cl" && msg == "reset")
+            if (user.Status == 2 && user.Condition == "cl")
             {
                 user.Condition = "op";
                 WebInterface.SendMessage(user.ID, "Теперь вам доступны функции отрывающего!");
@@ -259,7 +259,7 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Выберите количество машинок:", GetButtons.Clndt(user.note[0], user.note[1]));
                     return;
                 case "cldn":
-                    WebInterface.SendButtons(user.ID, ListToNumerableNotesStringList(user.notes, " записей") + "\nВыберите запись для отмены", GetButtons.Cldn(user));
+                    WebInterface.SendButtons(user.ID, ListToNumerableNotesStringList(user.Condition, user.notes, " записей") + "\nВыберите запись для отмены", GetButtons.Cldn(user));
                     return;
             }
         }
@@ -270,21 +270,24 @@ namespace ChatBotLaundry
             var i = 0;
             foreach (var item in list)
             {
-                stringListIds += i.ToString() + ". https://vk.com/im?sel=" + item.ToString() + "\n";
+                stringListIds += i.ToString() + ". https://vk.com/id" + item.ToString() + "\n";
                 i++;
             }
             if (list.Count == 0)
-                stringListIds = "Нет записей";
+                stringListIds = "Нет пользователей";
             return stringListIds;
         }
 
-        internal static string ListToNumerableNotesStringList(List<TimeNote> list, string ob)
+        internal static string ListToNumerableNotesStringList(string condition, List<TimeNote> list, string ob)
         {
             string stringListNotes = "Список" + ob + "\n";
-            var i = 0;
+            var i = 1;
             foreach (var item in list)
             {
-                stringListNotes += i.ToString() + ". " + item.ToString() + "\n";
+                if (condition == "n")
+                    stringListNotes += i.ToString() + ". " + item.ToString() + "\n";
+                else
+                    stringListNotes += i.ToString() + ". " + item.ToStringCl() + "\n";
                 i++;
             }
             if (list.Count == 0)

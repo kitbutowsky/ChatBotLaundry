@@ -175,7 +175,7 @@ namespace ChatBotLaundry
                 for (var d = 0; d < Data.Days.Count; d++)
                     if (Data.Days[d].IsEmpty && (Data.Days[d].AvailableForSSK == (status != 0)))
                     {
-                        var button = (StaticDataAndMetods.DayOfWeekR(Data.Days[d].Date) + " " + Data.Days[d].EmptySpaces.ToString(), d.ToString());
+                        var button = (StaticDataAndMetods.DayOfWeekR(Data.Days[d].Date) + " (" + Data.Days[d].EmptySpaces.ToString() + ")", d.ToString());
                         if (i % 2 == 0)
                             buttons.Add(new List<(string, string)> { button });
                         else
@@ -193,7 +193,7 @@ namespace ChatBotLaundry
                     for (var i = 0; i < Data.Days[day].HoursWashesTable.GetLength(0); i++)
                         if (Data.Days[day].EmptyTimes[i] != 0)
                         {
-                            var button = (Data.Days[day].WashesHours[i].ToTimezone().ToString() + ":00 " + Data.Days[day].EmptyTimes[i].ToString(), i.ToString()) ;
+                            var button = (Data.Days[day].WashesHours[i].ToTimezone().ToString() + ":00 (" + Data.Days[day].EmptyTimes[i].ToString() + ")", i.ToString()) ;
                             if (c % 2 == 0)
                                 buttons.Add(new List<(string, string)> { button });
                             else
@@ -209,7 +209,7 @@ namespace ChatBotLaundry
                         var buttons = new List<List<(string, string)>>();
                         for (var i = 1; i <= Data.Days[day].EmptyTimes[time]; i++)
                         {
-                            var button = new List<(string, string)> { (i.ToString() + ". ", i.ToString()) };
+                            var button = new List<(string, string)> { (i.ToString(), i.ToString()) };
                             buttons.Add(button);
                         }
                         buttons.Add(new List<(string, string)> { ("Назад", "b") });
@@ -220,7 +220,7 @@ namespace ChatBotLaundry
             {
                 var buttons = new List<List<(string, string)>>();
                 var c = 0;
-                for (var i = 0; i < user.notes.Count; i++)
+                for (var i = 1; i <= user.notes.Count; i++)
                 {
                     var button = (i.ToString(), i.ToString());
                     if (c % 5 == 0)

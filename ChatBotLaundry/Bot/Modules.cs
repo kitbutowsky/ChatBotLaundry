@@ -273,7 +273,7 @@ namespace ChatBotLaundry
                 {
                     if (button != "b")
                     {
-                        if (int.TryParse(msg, out int selectedNote) && (selectedNote < user.notes.Count && selectedNote >= 0))
+                        if (int.TryParse(msg, out int selectedNote) && (selectedNote <= user.notes.Count && selectedNote > 0))
                         {
                             DataMethods.RemoveNote(selectedNote, user);
                             if (user.notes.Count == 0)
@@ -484,8 +484,10 @@ namespace ChatBotLaundry
             {
                 if (button != "b")
                 {
-                    user.Condition = "optd";
-                    user.opnote[0] = int.Parse(button);
+                    if (int.TryParse(button, out user.opnote[0]))
+                        user.Condition = "optd";
+                    else
+                        user.Condition = "op";
                 }
                 else
                     user.Condition = "op";
