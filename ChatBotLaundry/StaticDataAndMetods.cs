@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Sheets.v4;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChatBotLaundry
 {
@@ -32,6 +33,21 @@ namespace ChatBotLaundry
             if (newtime >= 24)
                 newtime -= 24;
             return newtime;
+        }
+
+        public static string ToLetterColumn(int column)
+        {
+            column++;
+            string columnIndex = "";
+            var abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            while (column > 0)
+            {
+                columnIndex += abc[column % abc.Length - 1];
+                column /= abc.Length;
+            };
+            var newshit = columnIndex.ToCharArray().Reverse().ToArray();
+            columnIndex = string.Join("", newshit);
+            return columnIndex;
         }
     }
 }
