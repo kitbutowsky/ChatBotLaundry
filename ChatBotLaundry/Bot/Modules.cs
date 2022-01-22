@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace ChatBotLaundry
@@ -12,18 +13,18 @@ namespace ChatBotLaundry
             {
                 case "cl":
                     user.Condition = button;
+                    DataMethods.Update.Condition(user);
                     return;
                 case "op":
                     user.Condition = button;
+                    DataMethods.Update.Condition(user);
                     return;
                 case "ad":
                     user.Condition = button;
+                    DataMethods.Update.Condition(user);
                     return;
                 case "re":
                     WebInterface.SendMessage(user.ID, "Отчетность:");
-                    return;
-                case "infad":
-                    user.Condition = button;
                     return;
                 case "b":
                     user.Condition = "st";
@@ -40,6 +41,7 @@ namespace ChatBotLaundry
                         return;
                     case "l":
                         user.Condition = button;
+                        DataMethods.Update.Condition(user);
                         return;
                     case "n":
                         user.Condition = button;
@@ -113,20 +115,49 @@ namespace ChatBotLaundry
                                         {
                                             case 1:
                                                 us.Condition = "cl";
+                                                DataMethods.Update.Condition(us);
                                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
                                                 break;
                                             case 2:
                                                 us.Condition = "op";
+                                                DataMethods.Update.Condition(us);
                                                 WebInterface.SendButtons(us.ID, "Функции открывающего:", GetButtons.Op(us));
                                                 break;
                                             case 3:
                                                 us.Condition = "adm";
+                                                DataMethods.Update.Condition(us);
                                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Adm());
                                                 break;
                                         }
                                     }
                                     else
-                                        Data.Users.Add(new User { ID = usId, Status = int.Parse(user.adminIdsList.Item2) });
+                                    {
+                                        Data.Users.Add(
+                                            new User(
+                                                usId, 
+                                                TimeSpan.Zero,
+                                                DateTime.MinValue,
+                                                int.Parse(user.adminIdsList.Item2)
+                                                )
+                                            );
+                                        us = Data.Users[Data.Users.Count - 1];
+                                        var info = new List<object> {
+                                            us.ID,
+                                            us.Status,
+                                            us.NotificationStatus,
+                                            us.Blocked.Item1,
+                                            us.Blocked.Item2,
+                                            us.Blocked.Item3,
+                                            us.Condition,
+                                            us.WashCounter,
+                                            us.OpenerTimes,
+                                            us.AverageOpenerTime,
+                                            us.PasswordTries
+                                        };
+                                        DataMethods.Update.UserUpdates(us, info, fullUpdate: true);
+                                    }
+                                        
+                                        
                                 }
                                 user.adminIdsList.Item1.Add(usId);
                             }
@@ -146,9 +177,7 @@ namespace ChatBotLaundry
                                 var us = Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; });
                                 if (user.adminIdsList.Item2 == "bl")
                                 {
-                                    us.Blocked.Item1 = false;
-                                    us.Blocked.Item2 = DateTime.UtcNow; 
-                                    us.Blocked.Item3--;
+                                    us.Blocked = (false, DateTime.UtcNow, -1);
                                     WebInterface.SendMessage(us.ID, "Блокировка снята");
                                 }
                                 if (us.Status != 0)
@@ -157,6 +186,7 @@ namespace ChatBotLaundry
                                     WebInterface.SendMessage(us.ID, "Теперь вы клиент");
                                 }
                                 us.Condition = "cl";
+                                DataMethods.Update.Condition(us);
                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
                                 user.adminIdsList.Item1.RemoveAt(num);
                                 user.Condition = "usrs";
@@ -174,7 +204,7 @@ namespace ChatBotLaundry
                             return;
                         case "time":
                             user.Condition = button;
-                            break;
+                            return;
                         case "pas":
                             user.Condition = button;
                             return;
@@ -183,6 +213,7 @@ namespace ChatBotLaundry
                             return;
                         case "b":
                             user.Condition = "ad";
+                            DataMethods.Update.Condition(user);
                             return;
                     }
                 }
@@ -332,9 +363,11 @@ namespace ChatBotLaundry
                         {
                             case 3:
                                 user.Condition = "adm";
+                                DataMethods.Update.Condition(user);
                                 break;
                             case 2:
                                 user.Condition = "op";
+                                DataMethods.Update.Condition(user);
                                 break;
                         }
                     break;  
@@ -369,52 +402,24 @@ namespace ChatBotLaundry
                             {
                                 user.Condition = "cl";
                                 user.note[2] = note;
-                                MakeNote(user, user.note[0], user.note[1], user.note[2]);
+                                DataMethods.MakeNote(user, user.note[0], user.note[1], user.note[2]);
                             }
                             else
                                 user.Condition = "clnd";
                         }
 
-                                    internal static void MakeNote(User user, int selectedDay, int selectedTime, int amount)
-                                    {
-                                        var day = Data.Days[selectedDay];
-                                        var note = new TimeNote(
-                                                                user.ID,
-                                                                day.Date, 
-                                                                selectedTime,
-                                                                day.WashesHours[selectedTime].ToTimezone(),
-                                                                amount
-                                                                );
-                                        var max = day.EmptyTimes[selectedTime];
-                                        if (amount <= max) 
-                                        {
-                                            //поочередно проверяет ячейки и в свободные записывает id amount раз
-                                            for (var j = 0; j < day.WashesAmount; j++)
-                                                if (amount != 0 && day.HoursWashesTable[selectedTime, j] == 0)
-                                                {
-                                                    day.HoursWashesTable[selectedTime, j] = note.UserID;
-                                                    amount--;
-                                                }
-                                            //добавляет запись в список записей
-                                            day.Notes.Add(note);
-                                            WebInterface.SendMessage(user.ID, "Вы записаны");
-                                        }
-                                        else 
-                                            WebInterface.SendMessage(user.ID,   "Кажется вы слишком долго выбирали, это место уже забронировали\n" +
-                                                                                "Не отчаивайтесь! Выберите другое время)");
-                                    }
-
                 public static void Cldn(User user, string button)
                 {
                     if (button != "b")
                     {
-                        var selectedNote = int.Parse(button);
-                        DataMethods.RemoveNote(selectedNote, user);
-                        if (user.notes.Count == 0)
-                        {
-                            user.Condition = "cl";
-                            WebInterface.SendMessage(user.ID, "Все записи отменены");
-                        }   
+                        if (int.TryParse(button, out var selectedNote)){ 
+                            DataMethods.RemoveNote(selectedNote, user);
+                            if (user.notes.Count == 0)
+                            {
+                                user.Condition = "cl";
+                                WebInterface.SendMessage(user.ID, "Все записи отменены");
+                            }   
+                        }
                     }
                     else
                         user.Condition = "cl";
@@ -423,20 +428,22 @@ namespace ChatBotLaundry
         //функции открывающего
         public static void Op(User user, string button)
         {
-            if (button == "b")
+            switch (button)
             {
-                switch (user.Status)
-                {
-                    case 3:
+                case "opd":
+                    user.Condition = button;
+                    break;
+                case "opt":
+                    user.Condition = button;
+                    break;
+                case "b":
+                    if (user.Status == 3)
+                    {
                         user.Condition = "adm";
-                        break;
-                    case 2:
-                        user.Condition = "op";
-                        break;
-                }
+                        DataMethods.Update.Condition(user);
+                    };
+                    break;
             }
-            else if (button != "st" && button != "")
-                user.Condition = button;
         }
 
             public static void Opd(User user, string button)
@@ -466,9 +473,7 @@ namespace ChatBotLaundry
                     }
                     var id = int.Parse(button);
                     var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; });
-                    blU.Blocked.Item1 = true;
-                    blU.Blocked.Item2 = DateTime.UtcNow.AddDays(7);
-                    blU.Blocked.Item3++;
+                    blU.Blocked = (true, DateTime.UtcNow.AddDays(7), +1 );
                     user.OpenerIdsList.Remove(id);
                 }
             

@@ -9,7 +9,7 @@ namespace ChatBotLaundry
         /// <summary>
         /// ID таблиц которую мы используем как базу данных
         /// </summary>
-        public static readonly string SpreadsheetID = "1iTGZEAbp5AKaEaH3GgVm591w-bvDIYY5b2N9BYK5xfk";
+        public static readonly string SpreadsheetDBID = "1iTGZEAbp5AKaEaH3GgVm591w-bvDIYY5b2N9BYK5xfk";
 
         public static string Info;
         public static string NewInfo;

@@ -17,8 +17,26 @@ namespace ChatBotLaundry
                     return usr.ID == id;
                 }) == -1)
                 {
-                    user = new User() { ID = id };
-                    Data.Users.Add(user);
+                    user = new User(
+                        id,
+                        TimeSpan.Zero,
+                        DateTime.MinValue
+                        );
+                    Data.Users.Add(user); 
+                    var info = new List<object>{
+                        user.ID,
+                        user.Status,
+                        user.NotificationStatus,
+                        user.Blocked.Item1,
+                        user.Blocked.Item2,
+                        user.Blocked.Item3,
+                        user.Condition,
+                        user.WashCounter,
+                        user.OpenerTimes,
+                        user.AverageOpenerTime,
+                        user.PasswordTries
+                    };
+                    DataMethods.Update.UserUpdates(user, info, fullUpdate: true);
                 }
                 else
                     user = Data.Users.Find(delegate (User usr)
@@ -44,7 +62,7 @@ namespace ChatBotLaundry
             DataMethods.GetData();
             var thread = new Thread(() => CheckMessege());
             thread.Start();
-            var updater = new Thread(() => DataMethods.DayUpdate());
+            var updater = new Thread(() => DataMethods.NewDay());
             updater.Start();
             var noticer = new Thread(() => Notifications.Run());
             noticer.Start();

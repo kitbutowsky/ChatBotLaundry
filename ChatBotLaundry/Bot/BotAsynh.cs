@@ -33,6 +33,7 @@ namespace ChatBotLaundry
             {
                 case "st":
                     user.Condition = "adm";
+                    DataMethods.Update.Condition(user);
                     break;
                 case "adm":
                     Modules.Adm(user, button);
@@ -147,6 +148,7 @@ namespace ChatBotLaundry
             {
                 case "st":
                     user.Condition = "op";
+                    DataMethods.Update.Condition(user);
                     break;
             }
             OpenerActions(user, button);
@@ -167,6 +169,7 @@ namespace ChatBotLaundry
             {
                 case "st":
                     user.Condition = "cl";
+                    DataMethods.Update.Condition(user);
                     break;
             }
             ClientActions(user, button);
