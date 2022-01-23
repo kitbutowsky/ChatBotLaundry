@@ -23,7 +23,7 @@ namespace ChatBotLaundry
             get { return status; } 
             set { 
                 status = value;
-                DataMethods.Update.Status(this, value);
+                DataMethods.Update.User.Status(this, value);
             } }
 
         public bool NotificationStatus
@@ -32,7 +32,7 @@ namespace ChatBotLaundry
             set
             {
                 notificationStatus = value;
-                DataMethods.Update.NotificationStatus(this, value);
+                DataMethods.Update.User.NotificationStatus(this, value);
             }
         }
         /// <summary>
@@ -43,9 +43,9 @@ namespace ChatBotLaundry
             set
             {
                 blocked = value;
-                DataMethods.Update.Blocked(this, value.Item1);
-                DataMethods.Update.BlockingTime(this, value.Item2);
-                DataMethods.Update.BlockingCount(this, value.Item3);
+                DataMethods.Update.User.Blocked(this, value.Item1);
+                DataMethods.Update.User.BlockingTime(this, value.Item2);
+                DataMethods.Update.User.BlockingCount(this, value.Item3);
             }
         }
         public string Condition { 
@@ -57,7 +57,7 @@ namespace ChatBotLaundry
             set
             {
                 washCounter = value;
-                DataMethods.Update.WashCounter(this, value);
+                DataMethods.Update.User.WashCounter(this, value);
             }
         }
 
@@ -83,7 +83,7 @@ namespace ChatBotLaundry
             set
             {
                 openerTimes = value;
-                DataMethods.Update.OpenerTimes(this, value);
+                DataMethods.Update.User.OpenerTimes(this, value);
             }
         }
 
@@ -93,7 +93,7 @@ namespace ChatBotLaundry
             set
             {
                 averageOpenerTime = value;
-                DataMethods.Update.AverageOpenerTime(this, value);
+                DataMethods.Update.User.AverageOpenerTime(this, value);
             }
         }
         //поля для администратора
@@ -104,7 +104,7 @@ namespace ChatBotLaundry
             set
             {
                 passwordTries = value;
-                DataMethods.Update.PasswordTries(this, value);
+                DataMethods.Update.User.PasswordTries(this, value);
             }
         }
         /// <summary>

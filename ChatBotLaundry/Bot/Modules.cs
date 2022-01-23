@@ -13,15 +13,15 @@ namespace ChatBotLaundry
             {
                 case "cl":
                     user.Condition = button;
-                    DataMethods.Update.Condition(user);
+                    DataMethods.Update.User.Condition(user);
                     return;
                 case "op":
                     user.Condition = button;
-                    DataMethods.Update.Condition(user);
+                    DataMethods.Update.User.Condition(user);
                     return;
                 case "ad":
                     user.Condition = button;
-                    DataMethods.Update.Condition(user);
+                    DataMethods.Update.User.Condition(user);
                     return;
                 case "re":
                     WebInterface.SendMessage(user.ID, "Отчетность:");
@@ -41,7 +41,7 @@ namespace ChatBotLaundry
                         return;
                     case "l":
                         user.Condition = button;
-                        DataMethods.Update.Condition(user);
+                        DataMethods.Update.User.Condition(user);
                         return;
                     case "n":
                         user.Condition = button;
@@ -115,17 +115,17 @@ namespace ChatBotLaundry
                                         {
                                             case 1:
                                                 us.Condition = "cl";
-                                                DataMethods.Update.Condition(us);
+                                                DataMethods.Update.User.Condition(us);
                                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
                                                 break;
                                             case 2:
                                                 us.Condition = "op";
-                                                DataMethods.Update.Condition(us);
+                                                DataMethods.Update.User.Condition(us);
                                                 WebInterface.SendButtons(us.ID, "Функции открывающего:", GetButtons.Op(us));
                                                 break;
                                             case 3:
                                                 us.Condition = "adm";
-                                                DataMethods.Update.Condition(us);
+                                                DataMethods.Update.User.Condition(us);
                                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Adm());
                                                 break;
                                         }
@@ -186,7 +186,7 @@ namespace ChatBotLaundry
                                     WebInterface.SendMessage(us.ID, "Теперь вы клиент");
                                 }
                                 us.Condition = "cl";
-                                DataMethods.Update.Condition(us);
+                                DataMethods.Update.User.Condition(us);
                                 WebInterface.SendButtons(us.ID, "Выберите действие:", GetButtons.Cl(user));
                                 user.adminIdsList.Item1.RemoveAt(num);
                                 user.Condition = "usrs";
@@ -213,7 +213,7 @@ namespace ChatBotLaundry
                             return;
                         case "b":
                             user.Condition = "ad";
-                            DataMethods.Update.Condition(user);
+                            DataMethods.Update.User.Condition(user);
                             return;
                     }
                 }
@@ -363,11 +363,11 @@ namespace ChatBotLaundry
                         {
                             case 3:
                                 user.Condition = "adm";
-                                DataMethods.Update.Condition(user);
+                                DataMethods.Update.User.Condition(user);
                                 break;
                             case 2:
                                 user.Condition = "op";
-                                DataMethods.Update.Condition(user);
+                                DataMethods.Update.User.Condition(user);
                                 break;
                         }
                     break;  
@@ -440,7 +440,7 @@ namespace ChatBotLaundry
                     if (user.Status == 3)
                     {
                         user.Condition = "adm";
-                        DataMethods.Update.Condition(user);
+                        DataMethods.Update.User.Condition(user);
                     };
                     break;
             }

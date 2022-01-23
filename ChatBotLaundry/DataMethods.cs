@@ -121,7 +121,7 @@ namespace ChatBotLaundry
         public class Update
         {
             //обновление полей таблицы 
-            public static void UpdateNoteAmount(int day)
+            public static void NoteAmount(int day)
             {
                 var cell = $"Days!D{metaIndexes[day]}";
                 var valueRange = new ValueRange();
@@ -143,53 +143,58 @@ namespace ChatBotLaundry
                 var updateResponse = updateRequest.Execute();
             }
 
-            public static void MakeTimeNote(int day, int noteIndex)
+            public class TimeNote
             {
-                UpdateNoteAmount(day);
-                var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
-                var slotIndex = StaticDataAndMetods.ToLetterColumn(noteIndex);
-                var note = Data.Days[day].Notes[noteIndex];
-                var range = $"Days!{slotIndex}{stNumIndex}:{slotIndex}{stNumIndex+3}";
-                var valueRange = new ValueRange();
-                valueRange.Values = new List<IList<object>> { 
+                public static void Add(int day, int noteIndex)
+                {
+                    NoteAmount(day);
+                    var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
+                    var slotIndex = StaticDataAndMetods.ToLetterColumn(noteIndex);
+                    var note = Data.Days[day].Notes[noteIndex];
+                    var range = $"Days!{slotIndex}{stNumIndex}:{slotIndex}{stNumIndex + 3}";
+                    var valueRange = new ValueRange();
+                    valueRange.Values = new List<IList<object>> {
                     new List<object> { note.UserID },
                     new List<object> { note.Time },
                     new List<object> { note.TimeIndex },
                     new List<object> { note.Amount },
                 };
-                var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
-                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-                var updateResponse = updateRequest.Execute();
-            }
+                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
+                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                    var updateResponse = updateRequest.Execute();
+                }
 
-            public static void DeleteTimeNote(int day, int note)
-            {
-                UpdateNoteAmount(day);
-                var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
-                var slotIndex = StaticDataAndMetods.ToLetterColumn(note);
-                var range = $"Days!{slotIndex}{stNumIndex}:{stNumIndex + 3}";
-                var valueRange = new ClearValuesRequest();
-                var updateRequest = service.Spreadsheets.Values.Clear(valueRange, Data.SpreadsheetDBID, range);
-                updateRequest.Execute();
-                for (var i = note; i < Data.Days[day].Notes.Count; i++)
-                    MakeTimeNote(day, i);
+                public static void Delete(int day, int note)
+                {
+                    NoteAmount(day);
+                    var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
+                    var slotIndex = StaticDataAndMetods.ToLetterColumn(note);
+                    var range = $"Days!{slotIndex}{stNumIndex}:{stNumIndex + 3}";
+                    var valueRange = new ClearValuesRequest();
+                    var updateRequest = service.Spreadsheets.Values.Clear(valueRange, Data.SpreadsheetDBID, range);
+                    updateRequest.Execute();
+                    for (var i = note; i < Data.Days[day].Notes.Count; i++)
+                        Add(day, i);
+                }
             }
 
             //Обновление полей User(a)
-            public static void Status(User user, int status) => UserUpdates(user, new List<object> { status }, "B");
-            public static void NotificationStatus(User user, bool status) => UserUpdates(user, new List<object> { status }, "C");
-            public static void Blocked(User user, bool status) => UserUpdates(user, new List<object> { status }, "D");
-            public static void BlockingTime(User user, DateTime datetime) => UserUpdates(user, new List<object> { datetime }, "E");
-            public static void BlockingCount(User user, int count) => UserUpdates(user, new List<object> { count }, "F");
-            public static void Condition(User user) => UserUpdates(user, new List<object> { user.Condition }, "G");
-            public static void WashCounter(User user, int count) => UserUpdates(user, new List<object> { count }, "H");
-            public static void OpenerTimes(User user, int count) => UserUpdates(user, new List<object> { count }, "I");
-            public static void AverageOpenerTime(User user, TimeSpan time) => UserUpdates(user, new List<object> { time }, "J");
-            public static void PasswordTries(User user, int count) => UserUpdates(user, new List<object> { count }, "K");
-
-            public static void UserUpdates(User user, List<object> info, string column = "A", bool fullUpdate = false)
+            public class User
             {
-                var index = Data.Users.FindIndex(delegate (User us) { return us == user; }) + 2;
+                public static void Status(ChatBotLaundry.User user, int status) => UserUpdates(user, new List<object> { status }, "B");public static void NotificationStatus(ChatBotLaundry.User user, bool status) => UserUpdates(user, new List<object> { status }, "C");
+                public static void Blocked(ChatBotLaundry.User user, bool status) => UserUpdates(user, new List<object> { status }, "D");
+                public static void BlockingTime(ChatBotLaundry.User user, DateTime datetime) => UserUpdates(user, new List<object> { datetime }, "E");
+                public static void BlockingCount(ChatBotLaundry.User user, int count) => UserUpdates(user, new List<object> { count }, "F");
+                public static void Condition(ChatBotLaundry.User user) => UserUpdates(user, new List<object> { user.Condition }, "G");
+                public static void WashCounter(ChatBotLaundry.User user, int count) => UserUpdates(user, new List<object> { count }, "H");
+                public static void OpenerTimes(ChatBotLaundry.User user, int count) => UserUpdates(user, new List<object> { count }, "I");
+                public static void AverageOpenerTime(ChatBotLaundry.User user, TimeSpan time) => UserUpdates(user, new List<object> { time }, "J");
+                public static void PasswordTries(ChatBotLaundry.User user, int count) => UserUpdates(user, new List<object> { count }, "K");
+            }
+
+            public static void UserUpdates(ChatBotLaundry.User user, List<object> info, string column = "A", bool fullUpdate = false)
+            {
+                var index = Data.Users.FindIndex(delegate (ChatBotLaundry.User us) { return us == user; }) + 2;
                 var userRange = "";
                 if (fullUpdate)
                     userRange = $"Users!{column}{index}:{index}";
@@ -249,7 +254,7 @@ namespace ChatBotLaundry
                 //добавляет запись в список записей
                 day.Notes.Add(note);
                 WebInterface.SendMessage(user.ID, "Вы записаны");
-                Update.MakeTimeNote(selectedDay, day.Notes.Count-1);
+                Update.TimeNote.Add(selectedDay, day.Notes.Count-1);
             }
             else
                 WebInterface.SendMessage(user.ID, "Кажется вы слишком долго выбирали, это место уже забронировали\n" +
@@ -282,7 +287,7 @@ namespace ChatBotLaundry
                 }
             }
             Data.Days[selectedDay].Notes.Remove(user.notes[selectedNote]);
-            Update.DeleteTimeNote(selectedDay, selectedDBNote);
+            Update.TimeNote.Delete(selectedDay, selectedDBNote);
             user.notes.RemoveAt(selectedNote);
         }
 
