@@ -105,11 +105,11 @@ namespace ChatBotLaundry
                         for (var j = 0; j < int.Parse(day[0][4].ToString()); j++)
                             Data.Days[i].Notes.Add(
                                 new TimeNote(
-                                    long.Parse(day[Data.WashesHours.Count + 2][j].ToString()),
+                                    long.Parse(day[Data.Days[i].WashesHours.Count + 2][j].ToString()),
                                     DateTime.Parse(day[0][0].ToString()),
-                                    int.Parse(day[Data.WashesHours.Count + 4][j].ToString()),
-                                    int.Parse(day[Data.WashesHours.Count + 3][j].ToString()),
-                                    int.Parse(day[Data.WashesHours.Count + 5][j].ToString())
+                                    int.Parse(day[Data.Days[i].WashesHours.Count + 4][j].ToString()),
+                                    int.Parse(day[Data.Days[i].WashesHours.Count + 3][j].ToString()),
+                                    int.Parse(day[Data.Days[i].WashesHours.Count + 5][j].ToString())
                                     )
                             );
                     }
@@ -121,6 +121,16 @@ namespace ChatBotLaundry
         public class Update
         {
             //обновление полей таблицы 
+            public static void UpdateNoteAmount(int day)
+            {
+                var cell = $"Days!D{metaIndexes[day]}";
+                var valueRange = new ValueRange();
+                valueRange.Values = new List<IList<object>> { new List<object> { Data.Days[day].Notes.Count } };
+                var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, cell);
+                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                var updateResponse = updateRequest.Execute();
+            }
+
             public static void MakeTableNote(int day, int time, int slot, long id)
             {
                 var timeIndex = metaIndexes[day] + 1 + time;
@@ -135,6 +145,7 @@ namespace ChatBotLaundry
 
             public static void MakeTimeNote(int day, int noteIndex)
             {
+                UpdateNoteAmount(day);
                 var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
                 var slotIndex = StaticDataAndMetods.ToLetterColumn(noteIndex);
                 var note = Data.Days[day].Notes[noteIndex];
@@ -153,6 +164,7 @@ namespace ChatBotLaundry
 
             public static void DeleteTimeNote(int day, int note)
             {
+                UpdateNoteAmount(day);
                 var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
                 var slotIndex = StaticDataAndMetods.ToLetterColumn(note);
                 var range = $"Days!{slotIndex}{stNumIndex}:{stNumIndex + 3}";
@@ -192,8 +204,8 @@ namespace ChatBotLaundry
         }
 
 
-            public static void NewDay()
-            {
+        public static void NewDay()
+        {
             while (true)
             {
                 var time = new TimeSpan(1, 0, 0, 0);
