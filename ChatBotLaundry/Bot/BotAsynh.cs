@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using static ChatBotLaundry.Program;
 
 namespace ChatBotLaundry

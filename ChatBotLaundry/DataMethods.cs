@@ -100,9 +100,9 @@ namespace ChatBotLaundry
                     for (var j = 0; j < day[Data.WashesHours.Count + 1].Count; j++  )
                         Data.Days[i].HoursWashesOpenerTable[j] = long.Parse(day[Data.WashesHours.Count + 1][j].ToString());
                     //добавляем список записей
-                    if (int.Parse(day[0][4].ToString()) != 0)
+                    if (int.Parse(day[0][3].ToString()) != 0)
                     {
-                        for (var j = 0; j < int.Parse(day[0][4].ToString()); j++)
+                        for (var j = 0; j < int.Parse(day[0][3].ToString()); j++)
                             Data.Days[i].Notes.Add(
                                 new TimeNote(
                                     long.Parse(day[Data.Days[i].WashesHours.Count + 2][j].ToString()),
@@ -167,14 +167,25 @@ namespace ChatBotLaundry
                 public static void Delete(int day, int note)
                 {
                     NoteAmount(day);
-                    var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
-                    var slotIndex = StaticDataAndMetods.ToLetterColumn(note);
-                    var range = $"Days!{slotIndex}{stNumIndex}:{stNumIndex + 3}";
-                    var valueRange = new ClearValuesRequest();
-                    var updateRequest = service.Spreadsheets.Values.Clear(valueRange, Data.SpreadsheetDBID, range);
-                    updateRequest.Execute();
-                    for (var i = note; i < Data.Days[day].Notes.Count; i++)
-                        Add(day, i);
+                    var deleteRequest = new Request();
+                    deleteRequest.DeleteRange = new DeleteRangeRequest();
+                    deleteRequest.DeleteRange.Range = new GridRange()
+                    {
+                        SheetId = 722513283,
+                        StartColumnIndex = note,
+                        StartRowIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count,
+                        EndColumnIndex = note + 1,
+                        EndRowIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 4
+                    };
+                    deleteRequest.DeleteRange.ShiftDimension = "COLUMNS";
+
+                    BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
+                    requestBody.Requests = new List<Request> {
+                        deleteRequest
+                    }; ;
+
+                    SpreadsheetsResource.BatchUpdateRequest request = service.Spreadsheets.BatchUpdate(requestBody, Data.SpreadsheetDBID);
+                    BatchUpdateSpreadsheetResponse response = request.Execute();
                 }
             }
 
@@ -213,21 +224,39 @@ namespace ChatBotLaundry
         {
             while (true)
             {
-                var time = new TimeSpan(1, 0, 0, 0);
+                var time = new TimeSpan(0, 1, 0, 0);
+                if (Data.Days[6].Date.Date != DateTime.Now.Date)
+                {
+                    Data.DaysArhive.Add(Data.Days[0]);
+                    Data.Days.RemoveAt(0);
+                    var newDay = new Day
+                    (
+                        DateTime.UtcNow,
+                        Data.WashesAmount,
+                        Data.WashesHours
+                    );
+                    Data.Days.Add(newDay);
+                    ////меняем метаиндексы
+                    //var newMetaIndexes = new List<int>();
+                    //var dmetaIndexes = metaIndexes[1] - metaIndexes[0];
+                    //for (var mmi = 1; mmi < metaIndexes.Count; mmi++)
+                    //    newMetaIndexes.Add(metaIndexes[mmi] - dmetaIndexes);
+                    //newMetaIndexes.Add(newMetaIndexes[5] + Data.Days[6].WashesHours.Count + 6);
+                    ////копируем информацию из 6 дней
+                    //var dataRange = $"Days!A{}:4";
+                    //var dataRequest = service.Spreadsheets.Values.Get(Data.SpreadsheetDBID, dataRange);
+                    //var data = dataRequest.Execute().Values;
+                    ////очищаем таблицу
+                    ////вставляем информацию 6ти дней
+                    ////создаем новый день для таблицы
+                    ////оправляем этот день
+                    foreach (var us in Data.Users)
+                        if (us.Status == 3 || us.Status == 2)
+                            WebInterface.SendMessage(us.ID, "Обновилась запись");
+                }
                 Thread.Sleep(time);
-                Data.DaysArhive.Add(Data.Days[0]);
-                Data.Days.RemoveAt(0);
-                var newDay = new Day
-                (
-                    DateTime.UtcNow,
-                    Data.WashesAmount,
-                    Data.WashesHours
-                );
-                Data.Days.Add(newDay);
-                foreach (var us in Data.Users)
-                    if (us.Status == 3 || us.Status == 2)
-                        WebInterface.SendMessage(us.ID, "Обновилась запись");
-            }
+                
+            }   
         }
 
         internal static void MakeNote(User user, int selectedDay, int selectedTime, int amount)
