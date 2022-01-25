@@ -127,37 +127,53 @@ namespace ChatBotLaundry
 
         public class Update
         {
-            //обновление полей таблицы 
-            public static void NoteAmount(int day)
+            //обновление полей таблицы
+            public class Data
             {
-                var cell = $"Days!D{metaIndexes[day]}";
-                var valueRange = new ValueRange();
-                valueRange.Values = new List<IList<object>> { new List<object> { Data.Days[day].Notes.Count } };
-                var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, cell);
-                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-                var updateResponse = updateRequest.Execute();
-            }
-
-            public static void MakeTableNote(int day, int time, int slot, long id)
-            {
-                var timeIndex = metaIndexes[day] + 1 + time;
-                var slotIndex = StaticDataAndMetods.ToLetterColumn(slot+1);
-                var cell = $"Days!{slotIndex}{timeIndex}";
-                var valueRange = new ValueRange();
-                valueRange.Values = new List<IList<object>> { new List<object> { id } };
-                var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, cell);
-                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-                var updateResponse = updateRequest.Execute();
+                public static void NoteAmount(int day)
+                {
+                    var cell = $"Days!D{metaIndexes[day]}";
+                    var valueRange = new ValueRange();
+                    valueRange.Values = new List<IList<object>> { new List<object> { ChatBotLaundry.Data.Days[day].Notes.Count } };
+                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, ChatBotLaundry.Data.SpreadsheetDBID, cell);
+                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                    var updateResponse = updateRequest.Execute();
+                }
+                public static void MakeTableNote(int day, int time, int slot, long id)
+                {
+                    var timeIndex = metaIndexes[day] + 1 + time;
+                    var slotIndex = StaticDataAndMetods.ToLetterColumn(slot+1);
+                    var cell = $"Days!{slotIndex}{timeIndex}";
+                    var valueRange = new ValueRange();
+                    valueRange.Values = new List<IList<object>> { new List<object> { id } };
+                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, ChatBotLaundry.Data.SpreadsheetDBID, cell);
+                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                    var updateResponse = updateRequest.Execute();
+                }
+                public static void MetaIndexes(List<int> newMetaIndexes)
+                {
+                    metaIndexes = newMetaIndexes;
+                    var rangeMetaIndexes = $"Days!A1:H1";
+                    var valueRangeMetaIndexes = new ValueRange();
+                    valueRangeMetaIndexes.Values = new List<IList<object>>();
+                    var rowMetaIndexes = new List<object>();
+                    for (var j = 0; j < metaIndexes.Count; j++)
+                        rowMetaIndexes.Add(metaIndexes[j]);
+                    valueRangeMetaIndexes.Values.Add(rowMetaIndexes);
+                    var updateRequestMetaIndexes = service.Spreadsheets.Values.Update(valueRangeMetaIndexes, ChatBotLaundry.Data.SpreadsheetDBID, rangeMetaIndexes);
+                    updateRequestMetaIndexes.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                    var updateResponse = updateRequestMetaIndexes.Execute();
+                }
             }
 
             public class TimeNote
             {
                 public static void Add(int day, int noteIndex)
                 {
-                    NoteAmount(day);
-                    var stNumIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 1;
+                    Data.NoteAmount(day);
+                    var stNumIndex = metaIndexes[day] + 1 + ChatBotLaundry.Data.Days[day].WashesHours.Count + 1;
                     var slotIndex = StaticDataAndMetods.ToLetterColumn(noteIndex);
-                    var note = Data.Days[day].Notes[noteIndex];
+                    var note = ChatBotLaundry.Data.Days[day].Notes[noteIndex];
                     var range = $"Days!{slotIndex}{stNumIndex}:{slotIndex}{stNumIndex + 3}";
                     var valueRange = new ValueRange();
                     valueRange.Values = new List<IList<object>> {
@@ -166,23 +182,22 @@ namespace ChatBotLaundry
                         new List<object> { note.TimeIndex },
                         new List<object> { note.Amount },
                     };
-                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
+                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, ChatBotLaundry.Data.SpreadsheetDBID, range);
                     updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                     var updateResponse = updateRequest.Execute();
                 }
-
                 public static void Delete(int day, int note)
                 {
-                    NoteAmount(day);
+                    Data.NoteAmount(day);
                     var deleteRequest = new Request();
                     deleteRequest.DeleteRange = new DeleteRangeRequest();
                     deleteRequest.DeleteRange.Range = new GridRange()
                     {
                         SheetId = 722513283,
                         StartColumnIndex = note,
-                        StartRowIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count,
+                        StartRowIndex = metaIndexes[day] + 1 + ChatBotLaundry.Data.Days[day].WashesHours.Count,
                         EndColumnIndex = note + 1,
-                        EndRowIndex = metaIndexes[day] + 1 + Data.Days[day].WashesHours.Count + 4
+                        EndRowIndex = metaIndexes[day] + 1 + ChatBotLaundry.Data.Days[day].WashesHours.Count + 4
                     };
                     deleteRequest.DeleteRange.ShiftDimension = "COLUMNS";
 
@@ -191,7 +206,7 @@ namespace ChatBotLaundry
                         deleteRequest
                     }; ;
 
-                    SpreadsheetsResource.BatchUpdateRequest request = service.Spreadsheets.BatchUpdate(requestBody, Data.SpreadsheetDBID);
+                    SpreadsheetsResource.BatchUpdateRequest request = service.Spreadsheets.BatchUpdate(requestBody, ChatBotLaundry.Data.SpreadsheetDBID);
                     BatchUpdateSpreadsheetResponse response = request.Execute();
                 }
             }
@@ -212,7 +227,7 @@ namespace ChatBotLaundry
 
             public static void UserUpdates(ChatBotLaundry.User user, List<object> info, string column = "A", bool fullUpdate = false)
             {
-                var index = Data.Users.FindIndex(delegate (ChatBotLaundry.User us) { return us == user; }) + 2;
+                var index = ChatBotLaundry.Data.Users.FindIndex(delegate (ChatBotLaundry.User us) { return us == user; }) + 2;
                 var userRange = "";
                 if (fullUpdate)
                     userRange = $"Users!{column}{index}:{index}";
@@ -220,7 +235,7 @@ namespace ChatBotLaundry
                     userRange = $"Users!{column}{index}"; 
                 var valueRange = new ValueRange();
                 valueRange.Values = new List<IList<object>> { info };
-                var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, userRange);
+                var updateRequest = service.Spreadsheets.Values.Update(valueRange, ChatBotLaundry.Data.SpreadsheetDBID, userRange);
                 updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                 var updateResponse = updateRequest.Execute();
             }
@@ -245,7 +260,7 @@ namespace ChatBotLaundry
                     Data.Days.Add(newDay);
                     //меняем метаиндексы
                     var newMetaIndexes = new List<int>();
-                    var dmetaIndexes = metaIndexes[1] - metaIndexes[0]; 
+                    var dmetaIndexes = metaIndexes[1] - metaIndexes[0];
                     for (var mmi = 1; mmi < metaIndexes.Count; mmi++)
                         newMetaIndexes.Add(metaIndexes[mmi] - dmetaIndexes);
                     newMetaIndexes.Add(newMetaIndexes[6] + Data.Days[6].WashesHours.Count + 6);
@@ -255,39 +270,9 @@ namespace ChatBotLaundry
                     DeleteFirstDay();
                     //создаем новый день для таблицы
                     //оправляем этот день
-                    var day = Data.Days[6];
-                    var range = $"Days!A{newMetaIndexes[6]}";
-                    var valueRange = new ValueRange();
-                    valueRange.Values = new List<IList<object>> {
-                        new List<object> { day.Date, day.WashesAmount, day.WashesHours.Count, day.Notes.Count },
-                    };
-                    for (var i = 0; i < day.WashesHours.Count; i++)
-                    {
-                        var rowTable = new List<object>();
-                        rowTable.Add(day.WashesHours[i]);
-                        for (var j = 0; j < day.WashesAmount; j++)
-                            rowTable.Add(day.HoursWashesTable[i, j]);
-                        valueRange.Values.Add(rowTable);
-                    }
-                    var row = new List<object>();
-                    for (var j = 0; j < day.HoursWashesOpenerTable.Length; j++)
-                        row.Add(0);
-                    valueRange.Values.Add(row);
-                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
-                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-                    updateRequest.Execute();
+                    CreateAndSendDay(newMetaIndexes);
                     //обновляем метаиндексы
-                    metaIndexes = newMetaIndexes;
-                    var rangeMetaIndexes = $"Days!A1:H1";
-                    var valueRangeMetaIndexes = new ValueRange();
-                    valueRangeMetaIndexes.Values = new List<IList<object>>();
-                    var rowMetaIndexes = new List<object>();
-                    for (var j = 0; j < metaIndexes.Count; j++)
-                        rowMetaIndexes.Add(metaIndexes[j]);
-                    valueRangeMetaIndexes.Values.Add(rowMetaIndexes);
-                    var updateRequestMetaIndexes = service.Spreadsheets.Values.Update(valueRangeMetaIndexes, Data.SpreadsheetDBID, rangeMetaIndexes);
-                    updateRequestMetaIndexes.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-                    var updateResponse = updateRequestMetaIndexes.Execute();
+                    MetaIndexes(newMetaIndexes);
                     foreach (var us in Data.Users)
                         if (us.Status == 3 || us.Status == 2)
                             WebInterface.SendMessage(us.ID, "Обновилась запись");
@@ -295,6 +280,46 @@ namespace ChatBotLaundry
                 Thread.Sleep(time);
                 
             }   
+        }
+
+        private static void MetaIndexes(List<int> newMetaIndexes)
+        {
+            metaIndexes = newMetaIndexes;
+            var rangeMetaIndexes = $"Days!A1:H1";
+            var valueRangeMetaIndexes = new ValueRange();
+            valueRangeMetaIndexes.Values = new List<IList<object>>();
+            var rowMetaIndexes = new List<object>();
+            for (var j = 0; j < metaIndexes.Count; j++)
+                rowMetaIndexes.Add(metaIndexes[j]);
+            valueRangeMetaIndexes.Values.Add(rowMetaIndexes);
+            var updateRequestMetaIndexes = service.Spreadsheets.Values.Update(valueRangeMetaIndexes, Data.SpreadsheetDBID, rangeMetaIndexes);
+            updateRequestMetaIndexes.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            var updateResponse = updateRequestMetaIndexes.Execute();
+        }
+
+        private static void CreateAndSendDay(List<int> newMetaIndexes)
+        {
+            var day = Data.Days[6];
+            var range = $"Days!A{newMetaIndexes[6]}";
+            var valueRange = new ValueRange();
+            valueRange.Values = new List<IList<object>> {
+                        new List<object> { day.Date, day.WashesAmount, day.WashesHours.Count, day.Notes.Count },
+                    };
+            for (var i = 0; i < day.WashesHours.Count; i++)
+            {
+                var rowTable = new List<object>();
+                rowTable.Add(day.WashesHours[i]);
+                for (var j = 0; j < day.WashesAmount; j++)
+                    rowTable.Add(day.HoursWashesTable[i, j]);
+                valueRange.Values.Add(rowTable);
+            }
+            var row = new List<object>();
+            for (var j = 0; j < day.HoursWashesOpenerTable.Length; j++)
+                row.Add(0);
+            valueRange.Values.Add(row);
+            var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
+            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            updateRequest.Execute();
         }
 
         private static void DeleteFirstDay()
@@ -377,7 +402,7 @@ namespace ChatBotLaundry
                     if (amount != 0 && day.HoursWashesTable[selectedTime, j] == 0)
                     {
                         day.HoursWashesTable[selectedTime, j] = note.UserID;
-                        Update.MakeTableNote(selectedDay, selectedTime, j, note.UserID);
+                        Update.Data.MakeTableNote(selectedDay, selectedTime, j, note.UserID);
                         amount--;
                     }
                 //добавляет запись в список записей
@@ -411,7 +436,7 @@ namespace ChatBotLaundry
                     && amount != 0)
                 {
                     Data.Days[selectedDay].HoursWashesTable[selectedTime, i] = 0;
-                    Update.MakeTableNote(selectedDay, selectedTime, i, 0);
+                    Update.Data.MakeTableNote(selectedDay, selectedTime, i, 0);
                     amount -= 1;
                 }
             }
