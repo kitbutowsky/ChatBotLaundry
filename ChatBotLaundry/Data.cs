@@ -11,34 +11,82 @@ namespace ChatBotLaundry
         /// </summary>
         public static readonly string SpreadsheetDBID = "1iTGZEAbp5AKaEaH3GgVm591w-bvDIYY5b2N9BYK5xfk";
 
-        public static string Info;
+        public static string info;
+        public static string Info { 
+            get
+            {
+                return info;
+            }
+            set
+            {
+                info = value;
+                DataMethods.Update.Data.Info();
+            }
+        }
         public static string NewInfo;
 
-        public static string Password;
+        public static string password;
+        public static string Password
+        {
+            get
+            {
+                return password;
+            }
+            set
+            {
+                password = value;
+                DataMethods.Update.Data.Password();
+            }
+        }
 
         /// <summary>
         /// Количество машинок
         /// </summary>
-        public static int WashesAmount;
+        public static int washesAmount;
+        public static int WashesAmount
+        {
+            get
+            {
+                return washesAmount;
+            }
+            set
+            {
+                washesAmount = value;
+                DataMethods.Update.Data.WashesAmount();
+            }
+        }
         /// <summary>
         /// Время по которым работают машинки, со сдвигом по Timezone
         /// </summary>
-        public static List<int> WashesHours = new List<int> { }; 
+        public static List<int> washesHours = new List<int> { };
+        public static List<int> WashesHours 
+        {
+            get
+            {
+                return washesHours;
+            }
+            set
+            {
+                washesHours = value;
+                DataMethods.Update.Data.WashesHours();
+            }
+        }
+
         public static List<int> WashesOpenerHours
         {
             get
             {
                 var washesOpenerHours = new List<int> { };
-                if (WashesHours != null) 
+                if (washesHours != null) 
                 { 
-                    for (var i = 0; i < WashesHours.Count - 1; i++)
+                    for (var i = 0; i < washesHours.Count - 1; i++)
                     {
-                        washesOpenerHours.Add(WashesHours[i]);
-                        if (WashesHours[i + 1] - WashesHours[i] > 2)
-                            washesOpenerHours.Add(WashesHours[i] + 2);
+                        washesOpenerHours.Add(washesHours[i]);
+                        if (WashesHours[i + 1] - washesHours[i] > 2)
+                            washesOpenerHours.Add(washesHours[i] + 2);
                     }
-                    washesOpenerHours.Add(WashesHours[^1]);
-                    washesOpenerHours.Add(WashesHours[^1] + 2);
+                    washesOpenerHours.Add(washesHours[^1]);
+                    washesOpenerHours.Add(washesHours[^1] + 2);
                 }
                 return washesOpenerHours;
             }

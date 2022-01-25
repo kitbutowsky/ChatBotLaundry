@@ -256,13 +256,15 @@ namespace ChatBotLaundry
                         {
                             newtime += 24;
                         }
-                        if (Data.WashesHours.Contains(newtime))
-                            Data.WashesHours.Remove(newtime);
+                        var temporaryWashesHours = Data.WashesHours;
+                        if (temporaryWashesHours.Contains(newtime))
+                            temporaryWashesHours.Remove(newtime);
                         else
                         {
-                            Data.WashesHours.Add(newtime);
-                            Data.WashesHours.Sort();
+                            temporaryWashesHours.Add(newtime);
+                            temporaryWashesHours.Sort();
                         }
+                        Data.WashesHours = temporaryWashesHours;
                     }
                     
         
