@@ -11,6 +11,7 @@ namespace ChatBotLaundry
     class DataMethods
     {
         static List<int> metaIndexes = new List<int>();
+        static int archiveMetaIndex;
         static SheetsService service;
         static GoogleCredential credential;
 
@@ -72,6 +73,12 @@ namespace ChatBotLaundry
             if (daysMeta != null & daysMeta.Count > 0)
                 foreach (var index in daysMeta[0])
                     metaIndexes.Add(int.Parse(index.ToString()));
+
+            var daysArhMetaRange = $"Arhive!A1";
+            var daysArhMetaRequest = service.Spreadsheets.Values.Get(Data.SpreadsheetDBID, daysArhMetaRange);
+            var daysArhMeta = daysArhMetaRequest.Execute().Values;
+            if (daysArhMeta != null)
+                archiveMetaIndex = int.Parse(daysArhMeta[0][0].ToString());
 
             for (var i = 0; i < 7; i++)
             {
@@ -154,11 +161,11 @@ namespace ChatBotLaundry
                     var range = $"Days!{slotIndex}{stNumIndex}:{slotIndex}{stNumIndex + 3}";
                     var valueRange = new ValueRange();
                     valueRange.Values = new List<IList<object>> {
-                    new List<object> { note.UserID },
-                    new List<object> { note.Time },
-                    new List<object> { note.TimeIndex },
-                    new List<object> { note.Amount },
-                };
+                        new List<object> { note.UserID },
+                        new List<object> { note.Time },
+                        new List<object> { note.TimeIndex },
+                        new List<object> { note.Amount },
+                    };
                     var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
                     updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                     var updateResponse = updateRequest.Execute();
@@ -225,7 +232,7 @@ namespace ChatBotLaundry
             while (true)
             {
                 var time = new TimeSpan(0, 1, 0, 0);
-                if (Data.Days[6].Date.Date != DateTime.Now.Date)
+                if (Data.Days[0].Date.Date == DateTime.Now.Date.AddDays(-1) )
                 {
                     Data.DaysArhive.Add(Data.Days[0]);
                     Data.Days.RemoveAt(0);
@@ -236,20 +243,51 @@ namespace ChatBotLaundry
                         Data.WashesHours
                     );
                     Data.Days.Add(newDay);
-                    ////меняем метаиндексы
-                    //var newMetaIndexes = new List<int>();
-                    //var dmetaIndexes = metaIndexes[1] - metaIndexes[0];
-                    //for (var mmi = 1; mmi < metaIndexes.Count; mmi++)
-                    //    newMetaIndexes.Add(metaIndexes[mmi] - dmetaIndexes);
-                    //newMetaIndexes.Add(newMetaIndexes[5] + Data.Days[6].WashesHours.Count + 6);
-                    ////копируем информацию из 6 дней
-                    //var dataRange = $"Days!A{}:4";
-                    //var dataRequest = service.Spreadsheets.Values.Get(Data.SpreadsheetDBID, dataRange);
-                    //var data = dataRequest.Execute().Values;
-                    ////очищаем таблицу
-                    ////вставляем информацию 6ти дней
-                    ////создаем новый день для таблицы
-                    ////оправляем этот день
+                    //меняем метаиндексы
+                    var newMetaIndexes = new List<int>();
+                    var dmetaIndexes = metaIndexes[1] - metaIndexes[0]; 
+                    for (var mmi = 1; mmi < metaIndexes.Count; mmi++)
+                        newMetaIndexes.Add(metaIndexes[mmi] - dmetaIndexes);
+                    newMetaIndexes.Add(newMetaIndexes[6] + Data.Days[6].WashesHours.Count + 6);
+                    //переносим один день в архив
+                    MoveFirstDay();
+                    //удаляем первый день
+                    DeleteFirstDay();
+                    //создаем новый день для таблицы
+                    //оправляем этот день
+                    var day = Data.Days[6];
+                    var range = $"Days!A{newMetaIndexes[6]}";
+                    var valueRange = new ValueRange();
+                    valueRange.Values = new List<IList<object>> {
+                        new List<object> { day.Date, day.WashesAmount, day.WashesHours.Count, day.Notes.Count },
+                    };
+                    for (var i = 0; i < day.WashesHours.Count; i++)
+                    {
+                        var rowTable = new List<object>();
+                        rowTable.Add(day.WashesHours[i]);
+                        for (var j = 0; j < day.WashesAmount; j++)
+                            rowTable.Add(day.HoursWashesTable[i, j]);
+                        valueRange.Values.Add(rowTable);
+                    }
+                    var row = new List<object>();
+                    for (var j = 0; j < day.HoursWashesOpenerTable.Length; j++)
+                        row.Add(0);
+                    valueRange.Values.Add(row);
+                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
+                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                    updateRequest.Execute();
+                    //обновляем метаиндексы
+                    metaIndexes = newMetaIndexes;
+                    var rangeMetaIndexes = $"Days!A1:H1";
+                    var valueRangeMetaIndexes = new ValueRange();
+                    valueRangeMetaIndexes.Values = new List<IList<object>>();
+                    var rowMetaIndexes = new List<object>();
+                    for (var j = 0; j < metaIndexes.Count; j++)
+                        rowMetaIndexes.Add(metaIndexes[j]);
+                    valueRangeMetaIndexes.Values.Add(rowMetaIndexes);
+                    var updateRequestMetaIndexes = service.Spreadsheets.Values.Update(valueRangeMetaIndexes, Data.SpreadsheetDBID, rangeMetaIndexes);
+                    updateRequestMetaIndexes.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                    var updateResponse = updateRequestMetaIndexes.Execute();
                     foreach (var us in Data.Users)
                         if (us.Status == 3 || us.Status == 2)
                             WebInterface.SendMessage(us.ID, "Обновилась запись");
@@ -257,6 +295,68 @@ namespace ChatBotLaundry
                 Thread.Sleep(time);
                 
             }   
+        }
+
+        private static void DeleteFirstDay()
+        {
+            var deleteRequest = new Request();
+            deleteRequest.DeleteRange = new DeleteRangeRequest();
+            deleteRequest.DeleteRange.Range = new GridRange()
+            {
+                SheetId = 722513283,
+                StartColumnIndex = 0,
+                StartRowIndex = metaIndexes[0] - 1,
+                EndRowIndex = metaIndexes[1] - 1
+            };
+            deleteRequest.DeleteRange.ShiftDimension = "ROWS";
+
+            BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request> {
+                            deleteRequest
+                        }
+            };
+
+            SpreadsheetsResource.BatchUpdateRequest request = service.Spreadsheets.BatchUpdate(requestBody, Data.SpreadsheetDBID);
+            BatchUpdateSpreadsheetResponse response = request.Execute();
+        }
+
+        private static void MoveFirstDay()
+        {
+            var MoveRequest = new Request();
+            MoveRequest.CopyPaste = new CopyPasteRequest();
+            MoveRequest.CopyPaste.Source = new GridRange()
+            {
+                SheetId = 722513283,
+                StartColumnIndex = 0,
+                StartRowIndex = metaIndexes[0] - 1,
+                EndRowIndex = metaIndexes[1] - 1
+            };
+            MoveRequest.CopyPaste.Destination = new GridRange()
+            {
+                SheetId = 1587224433,
+                StartColumnIndex = 0,
+                StartRowIndex = archiveMetaIndex - 1,
+                EndRowIndex = archiveMetaIndex - 1 + metaIndexes[1] - metaIndexes[0]
+            };
+            archiveMetaIndex += metaIndexes[1] - metaIndexes[0];
+            var userRange = $"Arhive!A1";
+            var valueRange = new ValueRange();
+            valueRange.Values = new List<IList<object>> { new List<object> { archiveMetaIndex } };
+            var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, userRange);
+            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            
+            List<Request> requests = new List<Request> {
+                MoveRequest
+            };
+
+            BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
+            requestBody.Requests = requests;
+
+            SpreadsheetsResource.BatchUpdateRequest request = service.Spreadsheets.BatchUpdate(requestBody, Data.SpreadsheetDBID);
+
+            var updateResponse = updateRequest.Execute();
+            BatchUpdateSpreadsheetResponse response = request.Execute();
         }
 
         internal static void MakeNote(User user, int selectedDay, int selectedTime, int amount)
