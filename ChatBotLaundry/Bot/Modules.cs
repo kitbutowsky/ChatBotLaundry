@@ -32,7 +32,7 @@ namespace ChatBotLaundry
             };
         }
 
-            public static void Ad(User user, string button)
+        public static void Ad(User user, string button)
             {
                 switch (button)
                 {
@@ -464,30 +464,30 @@ namespace ChatBotLaundry
                 };
                 user.Condition = "op";
             }
-                
-                public static void Ddn(User user, string button)
-                {
-                    if (button == "y")
-                    {
-                        MakeOpenerNote(user);
-                        user.Condition = "op";
-                        return;
-                    }
-                    var id = int.Parse(button);
-                    var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; });
-                    blU.Blocked = (true, DateTime.UtcNow.AddDays(7), +1 );
-                    user.OpenerIdsList.Remove(id);
-                }
-            
-                                    public static void MakeOpenerNote(User user)
-                                    {
-                                        foreach (var id in user.OpenerIdsList)
-                                            Data.Users.Find(delegate (User usr) { return usr.ID == id; }).WashCounter++;
-                                        user.OpenerTimes++;
-                                        user.AverageOpenerTime = ((user.AverageOpenerTime * (user.OpenerTimes-1)) + new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second))/ user.OpenerTimes;
-                                    }
-            
-            public static void Opt(User user, string button)
+
+        public static void Ddn(User user, string button)
+        {
+            if (button == "y")
+            {
+                MakeOpenerNote(user);
+                user.Condition = "op";
+                return;
+            }
+            var id = int.Parse(button);
+            var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; });
+            blU.Blocked = (true, DateTime.UtcNow.AddDays(7), + 1);
+            user.OpenerIdsList.Remove(id);
+        }
+
+                                public static void MakeOpenerNote(User user)
+                                {
+                                    foreach (var id in user.OpenerIdsList)
+                                        Data.Users.Find(delegate (User usr) { return usr.ID == id; }).WashCounter++;
+                                    user.OpenerTimes++;
+                                    user.AverageOpenerTime = ((user.AverageOpenerTime * (user.OpenerTimes - 1)) + new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second)) / user.OpenerTimes;
+                                }
+
+        public static void Opt(User user, string button)
             {
                 if (button != "b")
                 {
