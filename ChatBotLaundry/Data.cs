@@ -91,16 +91,10 @@ namespace ChatBotLaundry
                 return washesOpenerHours;
             }
         }
-
-        /// <summary>
-        ///список всех дней записи
-        /// </summary>
-        public static List<Day> DaysArhive = new List<Day>();
         /// <summary>
         ///список дней записи недели
         /// </summary>
-        public static List<Day> Days = new List<Day>{
-        };
+        public static List<Day> Days = new List<Day>();
 
         /// <summary>
         /// список пользователей 
