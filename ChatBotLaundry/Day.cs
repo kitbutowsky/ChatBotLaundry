@@ -14,6 +14,25 @@ namespace ChatBotLaundry
         /// </summary>
         public int WashesAmount;
         //время записи для этого дня
+        public List<int> CountUsers
+        {
+            get{
+                var list = new List<int>();
+                foreach (var time in EmptyTimes)
+                    list.Add(WashesAmount - time);
+                return list; 
+            }
+        }
+        public int SumCountUsers { 
+            get 
+            {
+                var sum = 0;
+                foreach (var i in CountUsers)
+                    sum += i;
+                return sum;
+            }
+        }
+
         public List<int> WashesHours;
         public List<int> WashesOpenerHours
         {
