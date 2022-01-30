@@ -145,7 +145,7 @@ namespace ChatBotLaundry
                 buttons.Add(new List<(string, string)> { ("Не открыли", "ddop") });
             if (Data.Days.FindIndex(delegate (Day day)
             {
-                return (day.IsEmpty) && (day.AvailableForSSK == !(user.Status == 0));
+                return (day.IsEmpty) && (day.AvailableForSSK == !(user.Status == 0) && (day.Date.Date != DateTime.UtcNow.Date));
             }
             ) != -1)
                 buttons.Add(new List<(string, string)> { ("Записаться в прачечную", "cln") });
@@ -173,7 +173,7 @@ namespace ChatBotLaundry
                 var buttons = new List<List<(string, string)>>();
                 var i = 0;
                 for (var d = 0; d < Data.Days.Count; d++)
-                    if (Data.Days[d].IsEmpty && (Data.Days[d].AvailableForSSK == (status != 0)))
+                    if (Data.Days[d].IsEmpty && (Data.Days[d].AvailableForSSK == (status != 0)) && (Data.Days[d].Date.Date != DateTime.UtcNow.Date))
                     {
                         var button = (StaticDataAndMetods.DayOfWeekR(Data.Days[d].Date) + " (" + Data.Days[d].EmptySpaces.ToString() + ")", d.ToString());
                         if (i % 2 == 0)
