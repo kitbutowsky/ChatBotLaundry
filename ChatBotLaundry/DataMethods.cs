@@ -90,7 +90,7 @@ namespace ChatBotLaundry
                     var washesHours = new List<int>();
                     //заполняем таблицу времени записи в зависимости от количества слотов времени записи 
                     for (var it = 1; it <= int.Parse(day[0][2].ToString()); it++)
-                        washesHours.Add(int.Parse(day[it][0].ToString()));
+                        washesHours.Add(int.Parse(day[it][1].ToString()));
                     //создаем обьект дня записи
                     Data.Days.Add(
                         new Day(
@@ -99,10 +99,14 @@ namespace ChatBotLaundry
                                 washesHours
                                 )
                     );
+                    //добавляет статистику посещаемости
+                    if (int.Parse(day[0][4].ToString()) != 0)
+                        for (var ty = 0; ty <= int.Parse(day[0][2].ToString() + 1); ty++)
+                            Data.Days[i].CountUsers[ty - 1] = int.Parse(day[ty].ToString());
                     //добавляем таблицу записей
                     for (var ty = 1; ty <= int.Parse(day[0][2].ToString()); ty++)
-                        for (var tx = 1; tx < 1 + Data.Days[i].WashesAmount; tx++)
-                            Data.Days[i].HoursWashesTable[ty-1, tx-1] = long.Parse(day[ty][tx].ToString());
+                        for (var tx = 2; tx < 2 + Data.Days[i].WashesAmount; tx++)
+                            Data.Days[i].HoursWashesTable[ty-1, tx-2] = long.Parse(day[ty][tx].ToString());
                     //добавляем таблицу открывающих
                     for (var j = 0; j < day[Data.Days[i].WashesHours.Count + 1].Count; j++  )
                         Data.Days[i].HoursWashesOpenerTable[j] = long.Parse(day[Data.Days[i].WashesHours.Count + 1][j].ToString());
@@ -125,6 +129,56 @@ namespace ChatBotLaundry
             }
         }
 
+        public static void CreateReport()
+        {
+            for (var i = 0; i < 7; i++)
+            {
+                var dayRange = $"Days!a{metaIndexes[i]}:{metaIndexes[i + 1] - 1}";
+                var dayRequest = service.Spreadsheets.Values.Get(Data.SpreadsheetDBID, dayRange);
+                var day = dayRequest.Execute().Values;
+                if (day != null & day.Count > 0)
+                {
+                    var washesHours = new List<int>();
+                    //заполняем таблицу времени записи в зависимости от количества слотов времени записи 
+                    for (var it = 1; it <= int.Parse(day[0][2].ToString()); it++)
+                        washesHours.Add(int.Parse(day[it][1].ToString()));
+                    //создаем обьект дня записи
+                    Data.Days.Add(
+                        new Day(
+                                DateTime.Parse(day[0][0].ToString()),
+                                int.Parse(day[0][1].ToString()),
+                                washesHours
+                                )
+                    );
+                    //добавляет статистику посещаемости
+                    if (int.Parse(day[0][4].ToString()) != 0)
+                        for (var ty = 0; ty <= int.Parse(day[0][2].ToString() + 1); ty++)
+                            Data.Days[i].CountUsers[ty - 1] = int.Parse(day[ty].ToString());
+                    //добавляем таблицу записей
+                    for (var ty = 1; ty <= int.Parse(day[0][2].ToString()); ty++)
+                        for (var tx = 2; tx < 2 + Data.Days[i].WashesAmount; tx++)
+                            Data.Days[i].HoursWashesTable[ty - 1, tx - 2] = long.Parse(day[ty][tx].ToString());
+                    //добавляем таблицу открывающих
+                    for (var j = 0; j < day[Data.Days[i].WashesHours.Count + 1].Count; j++)
+                        Data.Days[i].HoursWashesOpenerTable[j] = long.Parse(day[Data.Days[i].WashesHours.Count + 1][j].ToString());
+                    //добавляем список записей
+                    if (int.Parse(day[0][3].ToString()) != 0)
+                    {
+                        for (var j = 0; j < int.Parse(day[0][3].ToString()); j++)
+                            Data.Days[i].Notes.Add(
+                                new TimeNote(
+                                    long.Parse(day[Data.Days[i].WashesHours.Count + 2][j].ToString()),
+                                    DateTime.Parse(day[0][0].ToString()),
+                                    int.Parse(day[Data.Days[i].WashesHours.Count + 4][j].ToString()),
+                                    int.Parse(day[Data.Days[i].WashesHours.Count + 3][j].ToString()),
+                                    int.Parse(day[Data.Days[i].WashesHours.Count + 5][j].ToString())
+                                    )
+                            );
+                    }
+                }
+            }
+        }
+
         public class Update
         {
             //обновление полей таблицы
@@ -142,10 +196,20 @@ namespace ChatBotLaundry
                 public static void MakeTableNote(int day, int time, int slot, long id)
                 {
                     var timeIndex = metaIndexes[day] + 1 + time;
-                    var slotIndex = StaticDataAndMetods.ToLetterColumn(slot+1);
+                    var slotIndex = StaticDataAndMetods.ToLetterColumn(slot+2);
                     var cell = $"Days!{slotIndex}{timeIndex}";
                     var valueRange = new ValueRange();
                     valueRange.Values = new List<IList<object>> { new List<object> { id } };
+                    var updateRequest = service.Spreadsheets.Values.Update(valueRange, ChatBotLaundry.Data.SpreadsheetDBID, cell);
+                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                    updateRequest.Execute();
+                }
+                public static void UserCount(int day, int time)
+                {
+                    var timeIndex = metaIndexes[day] + 1 + time;
+                    var cell = $"Days!A{timeIndex}";
+                    var valueRange = new ValueRange();
+                    valueRange.Values = new List<IList<object>> { new List<object> { ChatBotLaundry.Data.Days[day].CountUsers[time] } };
                     var updateRequest = service.Spreadsheets.Values.Update(valueRange, ChatBotLaundry.Data.SpreadsheetDBID, cell);
                     updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                     updateRequest.Execute();
@@ -198,6 +262,7 @@ namespace ChatBotLaundry
                     var stNumIndex = metaIndexes[day] + 1 + ChatBotLaundry.Data.Days[day].WashesHours.Count + 1;
                     var slotIndex = StaticDataAndMetods.ToLetterColumn(noteIndex);
                     var note = ChatBotLaundry.Data.Days[day].Notes[noteIndex];
+                    Data.UserCount(day, note.TimeIndex);
                     var range = $"Days!{slotIndex}{stNumIndex}:{slotIndex}{stNumIndex + 3}";
                     var valueRange = new ValueRange
                     {
@@ -279,7 +344,6 @@ namespace ChatBotLaundry
                 var time = new TimeSpan(0, 1, 0, 0);
                 if (Data.Days[0].Date.Date == DateTime.Now.Date.AddDays(-1) )
                 {
-                    Data.DaysArhive.Add(Data.Days[0]);
                     Data.Days.RemoveAt(0);
                     var newDay = new Day
                     (
@@ -337,7 +401,7 @@ namespace ChatBotLaundry
                     };
             for (var i = 0; i < day.WashesHours.Count; i++)
             {
-                var rowTable = new List<object> { day.WashesHours[i] };
+                var rowTable = new List<object> { 0 , day.WashesHours[i] };
                 for (var j = 0; j < day.WashesAmount; j++)
                     rowTable.Add(day.HoursWashesTable[i, j]);
                 valueRange.Values.Add(rowTable);
@@ -458,19 +522,18 @@ namespace ChatBotLaundry
             {
                 return note == user.notes[selectedNote];
             });
-            for (var i = 0; i < Data.WashesAmount; i++)
-            {
-                var selectedTime = user.notes[selectedNote].TimeIndex;
+            var selectedTime = user.notes[selectedNote].TimeIndex;
+            for (var i = 0; i < Data.Days[selectedDay].WashesAmount; i++)
                 if (Data.Days[selectedDay].HoursWashesTable[selectedTime, i] == user.notes[selectedNote].UserID
                     && amount != 0)
                 {
                     Data.Days[selectedDay].HoursWashesTable[selectedTime, i] = 0;
                     Update.Data.MakeTableNote(selectedDay, selectedTime, i, 0);
                     amount -= 1;
-                }
-            }
+                };
             Data.Days[selectedDay].Notes.Remove(user.notes[selectedNote]);
             Update.TimeNote.Delete(selectedDay, selectedDBNote);
+            Update.Data.UserCount(selectedDay, selectedTime);
             user.notes.RemoveAt(selectedNote);
         }
 
@@ -504,24 +567,41 @@ namespace ChatBotLaundry
             return listIds;
         }
 
-        /// <summary>
-        /// возвращает список записей для пользователя id или все записи 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="all"></param>
-        /// <returns></returns>
-        internal static List<TimeNote> GetNotes(long id, bool all = false)
-        {
-            var notes = new List<TimeNote>();
-            var dayIndex = 0;
-            foreach (var day in Data.Days)
+            /// <summary>
+            /// возвращает список записей для пользователя id или все записи 
+            /// </summary>
+            /// <param name="id"></param>
+            /// <param name="all"></param>
+            /// <returns></returns>
+            internal static List<TimeNote> GetNotes(long id, bool all = false)
             {
-                foreach (var note in day.Notes)
-                    if (note.UserID == id || all)
-                        notes.Add(note);
-                dayIndex++;
+                var notes = new List<TimeNote>();
+                var dayIndex = 0;
+                foreach (var day in Data.Days)
+                {
+                    foreach (var note in day.Notes)
+                        if (note.UserID == id || all)
+                            notes.Add(note);
+                    dayIndex++;
+                }
+                return notes;
             }
-            return notes;
-        }
+            /// <summary>
+            /// возвращает список записей для записанных пользователей на определенное время 
+            /// </summary>
+            /// <param name="id"></param>
+            /// <param name="all"></param>
+            /// <returns></returns>
+            internal static List<TimeNote> GetNotes(int day, int time)
+            {
+                var notes = new List<TimeNote>();
+                var now = DateTime.UtcNow.Hour;
+                foreach (var note in Data.Days[day].Notes)
+                    for (var i = 0; i < 3; i++)
+                        if (Data.Days[day].WashesOpenerHours[time] == now - i) 
+                            if (note.Time == Data.Days[day].WashesOpenerHours[time] || note.Time == Data.Days[day].WashesOpenerHours[time] + 2)
+                                notes.Add(note);
+                return notes;
+            }
     }
 }

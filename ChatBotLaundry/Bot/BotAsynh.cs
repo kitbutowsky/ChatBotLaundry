@@ -232,7 +232,7 @@ namespace ChatBotLaundry
                     WebInterface.SendButtons(user.ID, "Все ли пришли?", GetButtons.Opd(user));
                     return;
                 case "ddn":
-                    WebInterface.SendButtons(user.ID, ListToNumerableStringIdsList(user.OpenerIdsList, " пришедших") + "\n Выберите непришедших", GetButtons.Ddn(user));
+                    WebInterface.SendButtons(user.ID, ListToNumerableNotesStringList("n", user.notes, " людей которые должны были придти") + "\n Выберите непришедших", GetButtons.Ddn(user));
                     return;
                 case "opt":
                     WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", GetButtons.Opt());

@@ -177,7 +177,7 @@ namespace ChatBotLaundry
                                 var us = Data.Users.Find(delegate (User usr) { return usr.ID == user.adminIdsList.Item1[num]; });
                                 if (user.adminIdsList.Item2 == "bl")
                                 {
-                                    us.Blocked = (false, DateTime.UtcNow, -1);
+                                    us.Blocked = (false, DateTime.UtcNow, us.Blocked.Item3 - 1);
                                     WebInterface.SendMessage(us.ID, "Блокировка снята");
                                 }
                                 if (us.Status != 0)
@@ -459,7 +459,7 @@ namespace ChatBotLaundry
                         user.Condition = "ddn";
                         return;
                     case "b":
-                        user.OpenerIdsList.Clear();
+                        user.notes.Clear();
                         break;
                 };
                 user.Condition = "op";
@@ -473,16 +473,16 @@ namespace ChatBotLaundry
                 user.Condition = "op";
                 return;
             }
-            var id = int.Parse(button);
-            var blU = Data.Users.Find(delegate (User usr) { return usr.ID == id; });
-            blU.Blocked = (true, DateTime.UtcNow.AddDays(7), + 1);
-            user.OpenerIdsList.Remove(id);
+            var index = int.Parse(button);
+            var blU = Data.Users.Find(delegate (User usr) { return usr.ID == user.notes[index].UserID; });
+            blU.Blocked = (true, DateTime.UtcNow.AddDays(7), blU.Blocked.Item3 + 1);
+            DataMethods.RemoveNote(index, user);
         }
 
                                 public static void MakeOpenerNote(User user)
                                 {
-                                    foreach (var id in user.OpenerIdsList)
-                                        Data.Users.Find(delegate (User usr) { return usr.ID == id; }).WashCounter++;
+                                    foreach (var id in user.notes)
+                                        Data.Users.Find(delegate (User usr) { return usr.ID == id.UserID; }).WashCounter++;
                                     user.OpenerTimes++;
                                     user.AverageOpenerTime = ((user.AverageOpenerTime * (user.OpenerTimes - 1)) + new TimeSpan(0, DateTime.UtcNow.Minute, DateTime.UtcNow.Second)) / user.OpenerTimes;
                                 }

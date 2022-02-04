@@ -66,10 +66,6 @@ namespace ChatBotLaundry
 
         //поля для открывающего
         public int[] opnote = new[] { 7, 7 };
-        /// <summary>
-        /// список записанных на определенное время пользователей
-        /// </summary>
-        public List<long> OpenerIdsList;
 
         /// <summary>
         /// количество открытий и среднее время

@@ -236,19 +236,21 @@ namespace ChatBotLaundry
         internal static List<List<(string, string)>> Op(User user)
         {
             var buttons = new List<List<(string, string)>>();
-            var today = Data.Days.Find(delegate (Day d)
+            var today = Data.Days.FindIndex(delegate (Day d)
             {
                 return d.Date.Date == DateTime.UtcNow.Date;
             });
             //смотрит сегодняшний день и если есть время открытия на это время показывает кнопку
             var now = DateTime.UtcNow.Hour;
-            if (today != null)
-                if (today.WashesOpenerHours.Contains(now))
+            if (Data.Days[today] != null) { 
+                var time = Data.Days[today].WashesOpenerHours.FindIndex(delegate (int t) { return t == now; });
+                if (time != -1)
                 {
-                    user.OpenerIdsList = DataMethods.GetOpenerIdsList();
-                    if (user.OpenerIdsList.Count != 0)
+                    user.notes = DataMethods.GetNotes(today, time);
+                    if (user.notes.Count != 0)
                         buttons.Add(new List<(string, string)> { ("Открыл", "opd") });
                 }
+            }
             if (Data.Days.FindIndex(delegate (Day day)
             {
                 return day.IsEmptyOpener;
@@ -275,13 +277,13 @@ namespace ChatBotLaundry
                 internal static List<List<(string, string)>> Ddn(User user)
                 {
                     //кнопки с номерами и кнопка подтверждения
-                    var ids = user.OpenerIdsList;
+                    var ids = user.notes;
                     var buttons = new List<List<(string, string)>> {
                         new List<(string, string)> { },
                         new List<(string, string)> { ("Подтвердить", "y") }};
                     for (var i = 0; i < ids.Count; i++)
                     {
-                        var button = (i.ToString(), ids[i].ToString());
+                        var button = ((i+1).ToString(), i.ToString());
                         buttons[0].Add(button);
                     }
                     return buttons;
