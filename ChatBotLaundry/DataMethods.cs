@@ -99,10 +99,6 @@ namespace ChatBotLaundry
                                 washesHours
                                 )
                     );
-                    //добавляет статистику посещаемости
-                    if (int.Parse(day[0][4].ToString()) != 0)
-                        for (var ty = 0; ty <= int.Parse(day[0][2].ToString() + 1); ty++)
-                            Data.Days[i].CountUsers[ty - 1] = int.Parse(day[ty].ToString());
                     //добавляем таблицу записей
                     for (var ty = 1; ty <= int.Parse(day[0][2].ToString()); ty++)
                         for (var tx = 2; tx < 2 + Data.Days[i].WashesAmount; tx++)
@@ -126,56 +122,6 @@ namespace ChatBotLaundry
                     }
                 }    
 
-            }
-        }
-
-        public static void CreateReport()
-        {
-            for (var i = 0; i < 7; i++)
-            {
-                var dayRange = $"Days!a{metaIndexes[i]}:{metaIndexes[i + 1] - 1}";
-                var dayRequest = service.Spreadsheets.Values.Get(Data.SpreadsheetDBID, dayRange);
-                var day = dayRequest.Execute().Values;
-                if (day != null & day.Count > 0)
-                {
-                    var washesHours = new List<int>();
-                    //заполняем таблицу времени записи в зависимости от количества слотов времени записи 
-                    for (var it = 1; it <= int.Parse(day[0][2].ToString()); it++)
-                        washesHours.Add(int.Parse(day[it][1].ToString()));
-                    //создаем обьект дня записи
-                    Data.Days.Add(
-                        new Day(
-                                DateTime.Parse(day[0][0].ToString()),
-                                int.Parse(day[0][1].ToString()),
-                                washesHours
-                                )
-                    );
-                    //добавляет статистику посещаемости
-                    if (int.Parse(day[0][4].ToString()) != 0)
-                        for (var ty = 0; ty <= int.Parse(day[0][2].ToString() + 1); ty++)
-                            Data.Days[i].CountUsers[ty - 1] = int.Parse(day[ty].ToString());
-                    //добавляем таблицу записей
-                    for (var ty = 1; ty <= int.Parse(day[0][2].ToString()); ty++)
-                        for (var tx = 2; tx < 2 + Data.Days[i].WashesAmount; tx++)
-                            Data.Days[i].HoursWashesTable[ty - 1, tx - 2] = long.Parse(day[ty][tx].ToString());
-                    //добавляем таблицу открывающих
-                    for (var j = 0; j < day[Data.Days[i].WashesHours.Count + 1].Count; j++)
-                        Data.Days[i].HoursWashesOpenerTable[j] = long.Parse(day[Data.Days[i].WashesHours.Count + 1][j].ToString());
-                    //добавляем список записей
-                    if (int.Parse(day[0][3].ToString()) != 0)
-                    {
-                        for (var j = 0; j < int.Parse(day[0][3].ToString()); j++)
-                            Data.Days[i].Notes.Add(
-                                new TimeNote(
-                                    long.Parse(day[Data.Days[i].WashesHours.Count + 2][j].ToString()),
-                                    DateTime.Parse(day[0][0].ToString()),
-                                    int.Parse(day[Data.Days[i].WashesHours.Count + 4][j].ToString()),
-                                    int.Parse(day[Data.Days[i].WashesHours.Count + 3][j].ToString()),
-                                    int.Parse(day[Data.Days[i].WashesHours.Count + 5][j].ToString())
-                                    )
-                            );
-                    }
-                }
             }
         }
 
@@ -276,6 +222,7 @@ namespace ChatBotLaundry
                     var updateRequest = service.Spreadsheets.Values.Update(valueRange, ChatBotLaundry.Data.SpreadsheetDBID, range);
                     updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                     updateRequest.Execute();
+                    DataMethods.CreateReport();
                 }
                 public static void Delete(int day, int note)
                 {
@@ -303,6 +250,7 @@ namespace ChatBotLaundry
 
                     SpreadsheetsResource.BatchUpdateRequest request = service.Spreadsheets.BatchUpdate(requestBody, ChatBotLaundry.Data.SpreadsheetDBID);
                     BatchUpdateSpreadsheetResponse response = request.Execute();
+                    DataMethods.CreateReport();
                 }
             }
 
@@ -336,13 +284,56 @@ namespace ChatBotLaundry
             }
         }
 
+        public static void CreateReport()
+        {
+            var deleteTableRequest = new Request();
+            deleteTableRequest.DeleteSheet = new DeleteSheetRequest();
+            deleteTableRequest.DeleteSheet.SheetId = 0;
+            var createTableRequest = new Request();
+            createTableRequest.AddSheet = new AddSheetRequest();
+            createTableRequest.AddSheet.Properties = new SheetProperties { SheetId = 0, TabColor = new Color { Green = 1, Red = 1 }, Title = "Прачка" };
+            //создаем запрос для каждого дня
+            var DayCreateRequest = new List<Request> { deleteTableRequest, createTableRequest };
+            for (var i = 0; i < 7; i++)
+            {
+                var appendRequest = new Request();
+                appendRequest.AppendCells = new AppendCellsRequest();
+                var dateValues = new List<CellData> {
+                    new CellData { EffectiveFormat = new CellFormat { BackgroundColor = new Color{ Green = 1, Red = 1 }, }, UserEnteredValue = new ExtendedValue { StringValue = "Дата:" }  },
+                    new CellData { EffectiveFormat = new CellFormat { BackgroundColor = new Color{ Green = 1, Red = 1 }, }, UserEnteredValue = new ExtendedValue { StringValue = Data.Days[i].Date.ToString("D") } },
+                    new CellData { EffectiveFormat = new CellFormat { BackgroundColor = new Color{ Green = 1, Red = 1 }, }, UserEnteredValue = new ExtendedValue { StringValue = "День недели:" } },
+                    new CellData { EffectiveFormat = new CellFormat { BackgroundColor = new Color{ Green = 1, Red = 1 },  }, UserEnteredValue = new ExtendedValue { StringValue = StaticDataAndMetods.DayOfWeekR(Data.Days[i].Date) } } };
+                appendRequest.AppendCells.Rows = new List<RowData> { new RowData { Values = dateValues} };
+                for (var j = 0; j < Data.Days[i].WashesHours.Count; j++)
+                {
+                    var tableValues = new List<CellData>{
+                        new CellData { UserEnteredValue = new ExtendedValue { StringValue = (Data.Days[i].WashesHours[j]+StaticDataAndMetods.Timezone).ToString() + ":00" }
+                    }};
+                    for (var k = 0; k < Data.Days[i].WashesAmount; k++)
+                        if (Data.Days[i].HoursWashesTable[j, k] != 0)
+                            tableValues.Add(new CellData { EffectiveFormat = new CellFormat { HyperlinkDisplayType = "LINKED",  }, UserEnteredValue = new ExtendedValue { StringValue = "https://vk.com/id" + Data.Days[i].HoursWashesTable[j, k].ToString() } });
+                        else
+                            tableValues.Add(new CellData { UserEnteredValue = new ExtendedValue { StringValue = " " } });
+                    appendRequest.AppendCells.Rows.Add(new RowData { Values = tableValues });
+                }
+                appendRequest.AppendCells.Fields = '*';
+                appendRequest.AppendCells.SheetId = 0;
+                DayCreateRequest.Add(appendRequest);
+            }
+            BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = DayCreateRequest
+            };
+            SpreadsheetsResource.BatchUpdateRequest request = service.Spreadsheets.BatchUpdate(requestBody, "11WXWE0vARPf0bN0m2cGjRSyKAHhT2_PrDd3kK0lwhno");
+            BatchUpdateSpreadsheetResponse response = request.Execute();
+        }
 
         public static void NewDay()
         {
             while (true)
             {
                 var time = new TimeSpan(0, 1, 0, 0);
-                if (Data.Days[0].Date.Date == DateTime.Now.Date.AddDays(-1) )
+                if (Data.Days[0].Date.Date <= DateTime.Now.Date.AddDays(-1) )
                 {
                     Data.Days.RemoveAt(0);
                     var newDay = new Day
@@ -372,7 +363,7 @@ namespace ChatBotLaundry
                             WebInterface.SendMessage(us.ID, "Обновилась запись");
                 }
                 Thread.Sleep(time);
-                
+                DataMethods.CreateReport();
             }   
         }
 

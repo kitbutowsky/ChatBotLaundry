@@ -24,7 +24,11 @@ namespace ChatBotLaundry
                     DataMethods.Update.User.Condition(user);
                     return;
                 case "re":
-                    WebInterface.SendMessage(user.ID, "Отчетность:");
+                    WebInterface.SendMessage(user.ID, "Удобная таблица на эту неделю по ссылке:\n" +
+                        "https://docs.google.com/spreadsheets/d/11WXWE0vARPf0bN0m2cGjRSyKAHhT2_PrDd3kK0lwhno/edit?usp=sharing \n" +
+                        "Полная отчетность:\n" +
+                        "https://docs.google.com/spreadsheets/d/1iTGZEAbp5AKaEaH3GgVm591w-bvDIYY5b2N9BYK5xfk/edit?usp=sharing \n" +
+                        "Передача последней ссылки третьим лицам строго запрещена!!!");
                     return;
                 case "b":
                     user.Condition = "st";
