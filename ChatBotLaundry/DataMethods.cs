@@ -394,10 +394,6 @@ namespace ChatBotLaundry
                     rowTable.Add(day.HoursWashesTable[i, j]);
                 valueRange.Values.Add(rowTable);
             }
-            var row = new List<object>();
-            for (var j = 0; j < day.HoursWashesOpenerTable.Length; j++)
-                row.Add(0);
-            valueRange.Values.Add(row);
             var updateRequest = service.Spreadsheets.Values.Update(valueRange, Data.SpreadsheetDBID, range);
             updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
             updateRequest.Execute();
