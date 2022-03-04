@@ -189,12 +189,6 @@ namespace ChatBotLaundry
                 case "ddn":
                     Modules.Ddn(user, button);
                     break;
-                case "opt":
-                    Modules.Opt(user, button);
-                    break;
-                case "optd":
-                    Modules.Optd(user, button);
-                    break;
             }
         }
 
@@ -233,12 +227,6 @@ namespace ChatBotLaundry
                     return;
                 case "ddn":
                     WebInterface.SendButtons(user.ID, ListToNumerableNotesStringList("n", user.notes, " людей которые должны были придти") + "\n Выберите непришедших", GetButtons.Ddn(user));
-                    return;
-                case "opt":
-                    WebInterface.SendButtons(user.ID, "Выберите удобный день открытия", GetButtons.Opt());
-                    return;
-                case "optd":
-                    WebInterface.SendButtons(user.ID, "Выберите удобное время открытия", GetButtons.Optd(user.opnote[0]));
                     return;
             }
         }
