@@ -48,7 +48,7 @@ namespace ChatBotLaundry
                 {
                     WebInterface.SendMessage(user.ID, "Вы временно заблокированны");
                     var time = DateTime.UtcNow - user.Blocked.Item2;
-                    WebInterface.SendMessage(user.ID, "Время до конца блокировки: " + time.TotalHours.ToString() + " часов");
+                    WebInterface.SendMessage(user.ID, "Время до конца блокировки: " + ((int)((user.Blocked.Item2 - DateTime.UtcNow).TotalHours)).ToString() + " часов");
                 }
                 else
                     BotAsynh.Run(user, button, msg);
