@@ -103,9 +103,6 @@ namespace ChatBotLaundry
                     for (var ty = 1; ty <= int.Parse(day[0][2].ToString()); ty++)
                         for (var tx = 2; tx < 2 + Data.Days[i].WashesAmount; tx++)
                             Data.Days[i].HoursWashesTable[ty-1, tx-2] = long.Parse(day[ty][tx].ToString());
-                    //добавляем таблицу открывающих
-                    for (var j = 0; j < day[Data.Days[i].WashesHours.Count + 1].Count; j++  )
-                        Data.Days[i].HoursWashesOpenerTable[j] = long.Parse(day[Data.Days[i].WashesHours.Count + 1][j].ToString());
                     //добавляем список записей
                     if (int.Parse(day[0][3].ToString()) != 0)
                     {
