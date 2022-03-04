@@ -47,30 +47,5 @@ namespace ChatBotLaundry
                 }
             }       
         }
-
-        public static void OpenerNotice(Day day)
-        {
-            foreach (var n in day.Notes)
-            {
-                if (Data.Users.Find(delegate (User usr) { return usr.ID == n.UserID; }).NotificationStatus)
-                {
-                    var m = DateTime.UtcNow.Minute;
-                    if (n.Time == DateTime.UtcNow.Hour - 1)
-                    {
-                        if (m > 27 && m < 33)
-                            WebInterface.SendMessage(n.UserID, "Через 30 минут стирка");
-                        if (m > 52 && m < 58)
-                            WebInterface.SendMessage(n.UserID, "Через 5 минут стирка");
-                    }
-                    if (n.Time == DateTime.UtcNow.Hour + 1)
-                    {
-                        if (m > 27 && m < 33)
-                            WebInterface.SendMessage(n.UserID, "Не забудьте забрать вещи через 30 минут");
-                        if (m > 52 && m < 58)
-                            WebInterface.SendMessage(n.UserID, "Не забудьте забрать вещи через 5 минут");
-                    }
-                }
-            }
-        }
     }
 }
